@@ -4,4 +4,4 @@ tunnels:
   ghostsec:
     proto: http
     addr: 80
-    hostname: turtle-smashing-informally.ngrok-free.app
+    hostname: 
