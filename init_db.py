@@ -9,6 +9,18 @@ from cryptography.fernet import Fernet
 import os
 import json
 from dotenv import load_dotenv
+import logging
+
+# Set up logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('logs/init_db.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
 
 def create_initial_python_exercises():
     exercises = [
@@ -393,72 +405,92 @@ def create_additional_achievements():
         achievement = Achievement(**achievement_data)
         db.session.add(achievement)
 
-def init_database():
-    # Generate encryption key if not exists
-    if not os.getenv('ENCRYPTION_KEY'):
-        encryption_key = Fernet.generate_key()
-        with open('.env', 'a') as f:
-            f.write(f"\nENCRYPTION_KEY={encryption_key.decode()}")
-    
-    # Load environment variables
-    load_dotenv()
-    
-    app = create_app()
-    with app.app_context():
-        # Create all database tables
-        db.create_all()
+def init_db():
+    try:
+        # Generate encryption key if not exists
+        if not os.getenv('ENCRYPTION_KEY'):
+            encryption_key = Fernet.generate_key()
+            with open('.env', 'a') as f:
+                f.write(f"\nENCRYPTION_KEY={encryption_key.decode()}")
         
-        # Create admin user if it doesn't exist
-        admin = User.query.filter_by(email='admin@ghostsec.com').first()
-        if not admin:
-            hashed_password = bcrypt.generate_password_hash('Anonymous@23!').decode('utf-8')
+        # Load environment variables
+        load_dotenv()
+        
+        # Create the Flask app
+        app = create_app()
+        
+        with app.app_context():
+            logger.info("Starting database initialization")
+            
+            # Drop all existing tables
+            logger.info("Dropping existing tables")
+            db.drop_all()
+            
+            # Create all tables
+            logger.info("Creating new tables")
+            db.create_all()
+            
+            # Create admin user
+            admin_email = os.getenv('ADMIN_EMAIL', 'admin@ghostsec.com')
+            admin_password = os.getenv('ADMIN_PASSWORD', 'Anonymous@23!')
+            
             admin = User(
+                email=admin_email,
                 username='admin',
-                email='admin@ghostsec.com',
-                password=hashed_password,
-                is_admin=True,
-                date_joined=datetime.utcnow()
+                account_type='admin',
+                is_verified=True
             )
+            admin.set_password(admin_password)
+            
+            # Add admin to database
+            logger.info(f"Creating admin user with email: {admin_email}")
             db.session.add(admin)
+            
+            # Initialize learning content
+            if not PythonExercise.query.first():
+                logger.info("Creating initial Python exercises...")
+                create_initial_python_exercises()
+            
+            if not KaliLab.query.first():
+                logger.info("Creating initial Kali Linux labs...")
+                create_initial_kali_labs()
+            
+            if not MalwareAnalysisLab.query.first():
+                logger.info("Creating initial Malware Analysis labs...")
+                create_initial_malware_labs()
+            
+            if not PenTestLab.query.first():
+                logger.info("Creating initial Penetration Testing labs...")
+                create_initial_pentest_labs()
+            
+            if not CPPExercise.query.first():
+                logger.info("Creating initial C/C++ exercises...")
+                create_initial_cpp_exercises()
+            
+            if not Achievement.query.first():
+                logger.info("Creating achievements...")
+                create_initial_achievements()
+                create_additional_achievements()
+            
+            # Commit all changes
+            logger.info("Committing changes to database")
             db.session.commit()
-            print("Admin user created successfully!")
-        else:
-            admin.password = bcrypt.generate_password_hash('Anonymous@23!').decode('utf-8')
-            db.session.commit()
-            print("Admin password updated!")
-        
-        # Initialize learning content
-        if not PythonExercise.query.first():
-            print("Creating initial Python exercises...")
-            create_initial_python_exercises()
-        
-        if not KaliLab.query.first():
-            print("Creating initial Kali Linux labs...")
-            create_initial_kali_labs()
-        
-        if not MalwareAnalysisLab.query.first():
-            print("Creating initial Malware Analysis labs...")
-            create_initial_malware_labs()
-        
-        if not PenTestLab.query.first():
-            print("Creating initial Penetration Testing labs...")
-            create_initial_pentest_labs()
-        
-        if not CPPExercise.query.first():
-            print("Creating initial C/C++ exercises...")
-            create_initial_cpp_exercises()
-        
-        if not Achievement.query.first():
-            print("Creating achievements...")
-            create_initial_achievements()
-            create_additional_achievements()
-        
-        # Commit all changes
-        db.session.commit()
-        print("Database initialized successfully!")
-        print("\nDefault admin credentials:")
-        print("Email: admin@ghostsec.com")
-        print("Password: Anonymous@23!")
+            
+            logger.info("Database initialization completed successfully")
+            
+            return True
+            
+    except Exception as e:
+        logger.error(f"Error initializing database: {str(e)}", exc_info=True)
+        return False
 
 if __name__ == '__main__':
-    init_database()
+    # Create logs directory if it doesn't exist
+    if not os.path.exists('logs'):
+        os.makedirs('logs')
+        
+    success = init_db()
+    if success:
+        print("Database initialized successfully!")
+    else:
+        print("Error initializing database. Check logs/init_db.log for details.")

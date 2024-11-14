@@ -1,7 +1,0 @@
-version: "2"
-authtoken: "YOUR_TOKEN_HERE"
-tunnels:
-  ghostsec:
-    proto: http
-    addr: 80
-    hostname: 

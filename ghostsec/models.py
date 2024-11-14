@@ -1,26 +1,30 @@
 from datetime import datetime
-from ghostsec import db, login_manager
+from ghostsec import db, login_manager, bcrypt
 from flask_login import UserMixin
 from cryptography.fernet import Fernet
-from itsdangerous import URLSafeTimedSerializer
-import os
+from itsdangerous import URLSafeTimedSerializer as Serializer
+from flask import current_app
 from base64 import urlsafe_b64encode
 from dotenv import load_dotenv
+import os
+import secrets
 
 # Load environment variables
 load_dotenv()
 
-# Initialize encryption key
-def get_or_create_key():
+# Generate a proper Fernet key if not exists
+def get_encryption_key():
     key = os.getenv('ENCRYPTION_KEY')
     if not key:
-        # Generate a proper Fernet key
-        key = Fernet.generate_key().decode()
+        # Generate a new key
+        key = urlsafe_b64encode(secrets.token_bytes(32)).decode()
+        # Save to .env file
         with open('.env', 'a') as f:
             f.write(f"\nENCRYPTION_KEY={key}")
-    return key.encode() if isinstance(key, str) else key
+    return key.encode()
 
-ENCRYPTION_KEY = get_or_create_key()
+# Initialize encryption
+ENCRYPTION_KEY = get_encryption_key()
 cipher_suite = Fernet(ENCRYPTION_KEY)
 
 @login_manager.user_loader
@@ -32,7 +36,10 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
-    password = db.Column(db.String(60), nullable=True)  # Nullable for OAuth users
+    password = db.Column(db.String(60), nullable=False)
+    account_type = db.Column(db.String(20), nullable=False, default='user')
+    is_verified = db.Column(db.Boolean, default=False)
+    date_joined = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     
     # OAuth fields
     github_id = db.Column(db.String(120), unique=True, nullable=True)
@@ -55,8 +62,6 @@ class User(db.Model, UserMixin):
     two_factor_enabled = db.Column(db.Boolean, default=False)
     
     # Account status
-    is_verified = db.Column(db.Boolean, default=False)
-    account_type = db.Column(db.String(20), default='basic')
     reputation_points = db.Column(db.Integer, default=0)
     
     # Relationships
@@ -77,6 +82,29 @@ class User(db.Model, UserMixin):
     cpp_points = db.Column(db.Integer, default=0)
     total_achievements = db.Column(db.Integer, default=0)
     skill_level = db.Column(db.String(20), default='Beginner')
+    
+    def set_password(self, password):
+        """Hash and set the user's password"""
+        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
+    
+    def check_password(self, password):
+        """Check if the provided password matches the hash"""
+        return bcrypt.check_password_hash(self.password, password)
+    
+    def get_reset_token(self):
+        """Generate a password reset token"""
+        s = Serializer(current_app.config['SECRET_KEY'])
+        return s.dumps({'user_id': self.id})
+    
+    @staticmethod
+    def verify_reset_token(token):
+        """Verify a password reset token"""
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token)['user_id']
+        except:
+            return None
+        return User.query.get(user_id)
     
     def encrypt_data(self, data):
         if data:
@@ -127,21 +155,6 @@ class User(db.Model, UserMixin):
         else:
             return 'Expert'
 
-    def get_reset_token(self, expires_sec=1800):
-        """Generate a secure token for password reset"""
-        s = URLSafeTimedSerializer(os.getenv('SECRET_KEY'))
-        return s.dumps({'user_id': self.id}, salt='password-reset-salt')
-
-    @staticmethod
-    def verify_reset_token(token):
-        """Verify a password reset token"""
-        s = URLSafeTimedSerializer(os.getenv('SECRET_KEY'))
-        try:
-            user_id = s.loads(token, salt='password-reset-salt', max_age=1800)['user_id']
-        except:
-            return None
-        return User.query.get(user_id)
-
     def add_ctf_points(self, points):
         self.ctf_points += points
         self._update_skill_level()
@@ -175,6 +188,9 @@ class User(db.Model, UserMixin):
             self.skill_level = 'Intermediate'
         else:
             self.skill_level = 'Advanced'
+
+    def __repr__(self):
+        return f"User('{self.username}', '{self.email}', '{self.account_type}')"
 
 class ForumPost(db.Model):
     id = db.Column(db.Integer, primary_key=True)
