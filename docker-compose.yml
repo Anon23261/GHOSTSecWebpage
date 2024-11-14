@@ -4,12 +4,13 @@ services:
   web:
     build: .
     ports:
-      - "5000:5000"
+      - "0.0.0.0:5000:5000"
     environment:
       - FLASK_APP=app.py
       - FLASK_ENV=production
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/ghostsec
       - REDIS_URL=redis://redis:6379/0
+      - HOST=0.0.0.0
     volumes:
       - .:/app
       - /var/run/docker.sock:/var/run/docker.sock
@@ -25,17 +26,21 @@ services:
       - POSTGRES_DB=ghostsec
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
   redis:
     image: redis:7
     volumes:
       - redis_data:/data
+    ports:
+      - "6379:6379"
 
   nginx:
     image: nginx:latest
     ports:
-      - "80:80"
-      - "443:443"
+      - "0.0.0.0:80:80"
+      - "0.0.0.0:443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./ssl:/etc/nginx/ssl:ro

@@ -1,5 +1,5 @@
 """Database models for GhostSec application."""
-from app import db, login_manager
+from . import db, login_manager
 from flask_login import UserMixin
 from datetime import datetime
 import jwt
@@ -14,6 +14,8 @@ def load_user(user_id: str) -> Optional['User']:
 
 class User(db.Model, UserMixin):
     """User model for authentication and profile management."""
+    __tablename__ = 'user'
+    
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -57,14 +59,14 @@ class User(db.Model, UserMixin):
         """Generate password reset token."""
         return jwt.encode(
             {'reset_password': self.id, 'exp': time() + expires_in},
-            app.config['SECRET_KEY'], algorithm='HS256'
+            db.app.config['SECRET_KEY'], algorithm='HS256'
         )
 
     @staticmethod
     def verify_reset_token(token: str) -> Optional['User']:
         """Verify password reset token."""
         try:
-            id = jwt.decode(token, app.config['SECRET_KEY'],
+            id = jwt.decode(token, db.app.config['SECRET_KEY'],
                           algorithms=['HS256'])['reset_password']
         except:
             return None
@@ -96,6 +98,8 @@ followers = db.Table('followers',
 
 class ForumCategory(db.Model):
     """Model for forum categories."""
+    __tablename__ = 'forum_category'
+    
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(200))
@@ -103,6 +107,8 @@ class ForumCategory(db.Model):
 
 class ForumPost(db.Model):
     """Model for forum posts."""
+    __tablename__ = 'forum_post'
+    
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text, nullable=False)
@@ -117,6 +123,8 @@ class ForumPost(db.Model):
 
 class ForumComment(db.Model):
     """Model for forum comments."""
+    __tablename__ = 'forum_comment'
+    
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
     date_posted = db.Column(db.DateTime, default=datetime.utcnow)
@@ -124,9 +132,12 @@ class ForumComment(db.Model):
     post_id = db.Column(db.Integer, db.ForeignKey('forum_post.id'), nullable=False)
     parent_id = db.Column(db.Integer, db.ForeignKey('forum_comment.id'))
     likes = db.Column(db.Integer, default=0)
+    replies = db.relationship('ForumComment', backref=db.backref('parent', remote_side=[id]), lazy=True)
 
 class Project(db.Model):
     """Model for collaborative projects."""
+    __tablename__ = 'project'
+    
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
@@ -139,6 +150,8 @@ class Project(db.Model):
 
 class ProjectMember(db.Model):
     """Model for project members."""
+    __tablename__ = 'project_member'
+    
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -147,6 +160,8 @@ class ProjectMember(db.Model):
 
 class ChatRoom(db.Model):
     """Model for chat rooms."""
+    __tablename__ = 'chat_room'
+    
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
     is_private = db.Column(db.Boolean, default=False)
@@ -156,16 +171,20 @@ class ChatRoom(db.Model):
 
 class ChatMessage(db.Model):
     """Model for chat messages."""
+    __tablename__ = 'chat_message'
+    
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     room_id = db.Column(db.Integer, db.ForeignKey('chat_room.id'), nullable=False)
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    message_type = db.Column(db.String(20), default='text')  # text, file, code
+    message_type = db.Column(db.String(20), default='text')
     file_url = db.Column(db.String(200))
 
 class ChatMember(db.Model):
     """Model for chat room members."""
+    __tablename__ = 'chat_member'
+    
     id = db.Column(db.Integer, primary_key=True)
     room_id = db.Column(db.Integer, db.ForeignKey('chat_room.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -175,6 +194,8 @@ class ChatMember(db.Model):
 
 class LabInstance(db.Model):
     """Model for tracking lab instances."""
+    __tablename__ = 'lab_instance'
+    
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     lab_type = db.Column(db.String(50), nullable=False)
@@ -186,6 +207,8 @@ class LabInstance(db.Model):
 
 class Report(db.Model):
     """Model for lab completion reports."""
+    __tablename__ = 'report'
+    
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     lab_instance_id = db.Column(db.Integer, db.ForeignKey('lab_instance.id'))
@@ -196,6 +219,8 @@ class Report(db.Model):
 
 class Achievement(db.Model):
     """Model for user achievements and badges."""
+    __tablename__ = 'achievement'
+    
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     name = db.Column(db.String(50), nullable=False)
