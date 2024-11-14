@@ -1,15 +1,17 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
-from flask_socketio import SocketIO
-from flask_mail import Mail
-from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
+from flask_login import LoginManager
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_restful import Api
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
+import redis
+from flask_limiter.errors import ConfigurationError
+from flask_socketio import SocketIO
+from flask_mail import Mail
+from flask_migrate import Migrate
 
 # Load environment variables
 load_dotenv()
@@ -24,19 +26,43 @@ socketio = SocketIO()
 mail = Mail()
 migrate = Migrate()
 
-# Initialize rate limiter with Redis storage
-redis_url = os.getenv('REDIS_URL')
-if redis_url and redis_url.startswith('rediss://'):
-    # For SSL Redis connections, use redis:// and handle SSL in storage options
-    storage_uri = redis_url.replace('rediss://', 'redis://')
-else:
-    storage_uri = redis_url if redis_url else "memory://"
+# Initialize rate limiter with fallback to memory storage
+def get_redis_client():
+    redis_url = os.getenv('REDIS_URL')
+    if not redis_url:
+        return None
+        
+    try:
+        # Try to create a Redis client
+        client = redis.from_url(redis_url)
+        # Test the connection
+        client.ping()
+        return client
+    except (redis.ConnectionError, redis.RedisError):
+        return None
 
-limiter = Limiter(
-    key_func=get_remote_address,
-    default_limits=["200 per day", "50 per hour"],
-    storage_uri=storage_uri
-)
+# Configure limiter with fallback
+redis_client = get_redis_client()
+if redis_client:
+    storage_uri = os.getenv('REDIS_URL')
+else:
+    storage_uri = "memory://"
+
+try:
+    limiter = Limiter(
+        key_func=get_remote_address,
+        default_limits=["200 per day", "50 per hour"],
+        storage_uri=storage_uri,
+        storage_options={"client": redis_client} if redis_client else {}
+    )
+except ConfigurationError:
+    # Fallback to memory storage if Redis configuration fails
+    limiter = Limiter(
+        key_func=get_remote_address,
+        default_limits=["200 per day", "50 per hour"],
+        storage_uri="memory://"
+    )
+
 api = Api()
 
 def create_app():
