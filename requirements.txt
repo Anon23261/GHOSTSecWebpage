@@ -7,7 +7,10 @@ Flask-Bcrypt==1.0.1
 Flask-SocketIO==5.3.5
 Flask-Migrate==4.0.5
 Flask-RESTful==0.3.10
+# Rate limiting
 Flask-Limiter==3.5.0
+redis==5.0.1
+limits==3.7.0
 email-validator==2.0.0
 Pillow==10.0.0
 pyotp==2.9.0

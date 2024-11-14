@@ -22,10 +22,11 @@ migrate = Migrate()
 bcrypt = Bcrypt()
 login_manager = LoginManager()
 
-# Initialize rate limiter with in-memory storage (for development)
+# Initialize rate limiter with Redis storage
 limiter = Limiter(
     key_func=get_remote_address,
-    default_limits=["200 per day", "50 per hour"]
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="redis://localhost:6379"
 )
 api = Api()
 
@@ -66,7 +67,7 @@ def create_app():
     
     # Register blueprints
     from ghostsec.auth import auth as auth_blueprint
-    app.register_blueprint(auth_blueprint)
+    app.register_blueprint(auth_blueprint, url_prefix='/auth')
     
     from ghostsec.main import main as main_blueprint
     app.register_blueprint(main_blueprint)
