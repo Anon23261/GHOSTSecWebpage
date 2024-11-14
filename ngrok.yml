@@ -1,5 +1,5 @@
 version: "2"
-authtoken: "2op8hUgBXaJSyTk58Ie4p0kWhmJ_beoLuKdhCNN6sXvoi3Rf"
+authtoken: "YOUR_TOKEN_HERE"
 tunnels:
   ghostsec:
     proto: http
