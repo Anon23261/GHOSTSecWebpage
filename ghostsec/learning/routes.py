@@ -7,6 +7,10 @@ import subprocess
 import docker
 import os
 
+@learning.route('/')
+def index():
+    return redirect(url_for('learning.learn_home'))
+
 @learning.route('/learn')
 @login_required
 def learn_home():

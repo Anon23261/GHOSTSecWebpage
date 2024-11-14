@@ -18,7 +18,7 @@
             <div class="card-body">
                 <h5 class="card-title">Learn Cybersecurity</h5>
                 <p class="card-text">Access our comprehensive learning resources and structured courses.</p>
-                <a href="{{ url_for('learning.index') }}" class="btn btn-primary">Explore Courses</a>
+                <a href="{{ url_for('learning.learn_home') }}" class="btn btn-primary">Explore Courses</a>
             </div>
         </div>
     </div>
@@ -27,16 +27,16 @@
             <div class="card-body">
                 <h5 class="card-title">CTF Challenges</h5>
                 <p class="card-text">Test your skills with our Capture The Flag challenges.</p>
-                <a href="{{ url_for('ctf.index') }}" class="btn btn-primary">View Challenges</a>
+                <a href="{{ url_for('ctf.ctf_game') }}" class="btn btn-primary">View Challenges</a>
             </div>
         </div>
     </div>
     <div class="col-md-4">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Marketplace</h5>
-                <p class="card-text">Browse and purchase cybersecurity tools and resources.</p>
-                <a href="{{ url_for('marketplace.index') }}" class="btn btn-primary">Visit Marketplace</a>
+                <h5 class="card-title">Community Forum</h5>
+                <p class="card-text">Join discussions, share knowledge, and learn from others.</p>
+                <a href="{{ url_for('forum.forum_home') }}" class="btn btn-primary">Join Discussions</a>
             </div>
         </div>
     </div>
