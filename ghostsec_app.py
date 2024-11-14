@@ -1,6 +1,6 @@
-from flask import Flask, render_template
+from ghostsec import create_app, socketio
 
-app = Flask(__name__)
+app = create_app()
 
 @app.route('/')
 def home():
@@ -15,4 +15,4 @@ def software_eng():
     return render_template('software_engineering.html')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=False)

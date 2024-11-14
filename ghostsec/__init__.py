@@ -26,42 +26,12 @@ socketio = SocketIO()
 mail = Mail()
 migrate = Migrate()
 
-# Initialize rate limiter with fallback to memory storage
-def get_redis_client():
-    redis_url = os.getenv('REDIS_URL')
-    if not redis_url:
-        return None
-        
-    try:
-        # Try to create a Redis client
-        client = redis.from_url(redis_url)
-        # Test the connection
-        client.ping()
-        return client
-    except (redis.ConnectionError, redis.RedisError):
-        return None
-
-# Configure limiter with fallback
-redis_client = get_redis_client()
-if redis_client:
-    storage_uri = os.getenv('REDIS_URL')
-else:
-    storage_uri = "memory://"
-
-try:
-    limiter = Limiter(
-        key_func=get_remote_address,
-        default_limits=["200 per day", "50 per hour"],
-        storage_uri=storage_uri,
-        storage_options={"client": redis_client} if redis_client else {}
-    )
-except ConfigurationError:
-    # Fallback to memory storage if Redis configuration fails
-    limiter = Limiter(
-        key_func=get_remote_address,
-        default_limits=["200 per day", "50 per hour"],
-        storage_uri="memory://"
-    )
+# Initialize rate limiter with memory storage
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://"
+)
 
 api = Api()
 
