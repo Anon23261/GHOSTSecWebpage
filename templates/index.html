@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHOSTSec - Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <h1>GHOSTSec</h1>
+            <ul>
+                <li><a href="{{ url_for('home') }}" class="active">Home</a></li>
+                <li><a href="{{ url_for('python_cyber') }}">Python & Cybersecurity</a></li>
+                <li><a href="{{ url_for('software_eng') }}">Software Engineering</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h2>Welcome to GHOSTSec</h2>
+            <p>Your resource for Python, Cybersecurity, and Software Engineering knowledge.</p>
+        </section>
+
+        <section class="features">
+            <div class="feature-card">
+                <h3>Python & Cybersecurity</h3>
+                <p>Learn about Python programming and cybersecurity concepts.</p>
+                <a href="{{ url_for('python_cyber') }}" class="btn">Learn More</a>
+            </div>
+            <div class="feature-card">
+                <h3>Software Engineering</h3>
+                <p>Explore software engineering principles and best practices.</p>
+                <a href="{{ url_for('software_eng') }}" class="btn">Learn More</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 GHOSTSec. All rights reserved.</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: ghostsec
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python run_production.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FLASK_ENV
+        value: production

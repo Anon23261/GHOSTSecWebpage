@@ -1,0 +1,146 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Left Sidebar: Tools and Categories -->
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Kali Linux Tools</h4>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="#info-gathering" class="list-group-item list-group-item-action">Information Gathering</a>
+                        <a href="#vuln-analysis" class="list-group-item list-group-item-action">Vulnerability Analysis</a>
+                        <a href="#web-apps" class="list-group-item list-group-item-action">Web Applications</a>
+                        <a href="#password-attacks" class="list-group-item list-group-item-action">Password Attacks</a>
+                        <a href="#wireless-attacks" class="list-group-item list-group-item-action">Wireless Attacks</a>
+                        <a href="#reverse-engineering" class="list-group-item list-group-item-action">Reverse Engineering</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Learning Resources</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li><a href="#tutorials">Video Tutorials</a></li>
+                        <li><a href="#documentation">Documentation</a></li>
+                        <li><a href="#cheatsheets">Cheat Sheets</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Virtual Lab Environment</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Terminal Emulator -->
+                    <div class="terminal-container bg-dark text-light p-3 mb-4" style="height: 400px; overflow-y: auto;">
+                        <div id="terminal"></div>
+                    </div>
+
+                    <!-- Lab Instructions -->
+                    <div class="lab-instructions">
+                        <h4>Current Lab: <span id="current-lab-title">Introduction to Kali Linux</span></h4>
+                        <div id="lab-description">
+                            Select a lab from the right sidebar to begin.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar: Labs and Progress -->
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Available Labs</h4>
+                </div>
+                <div class="card-body">
+                    <div class="lab-list">
+                        {% for lab in labs %}
+                        <div class="lab-item mb-3">
+                            <h5>{{ lab.title }}</h5>
+                            <p class="small">{{ lab.description }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-primary">{{ lab.difficulty }}</span>
+                                <button class="btn btn-sm btn-outline-success" onclick="startLab('{{ lab.id }}')">
+                                    Start Lab
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Your Progress</h4>
+                </div>
+                <div class="card-body">
+                    <div class="progress mb-3">
+                        <div class="progress-bar" role="progressbar" style="width: {{ progress }}%">
+                            {{ progress }}%
+                        </div>
+                    </div>
+                    <div class="stats">
+                        <p>Completed Labs: {{ completed_labs }}/{{ total_labs }}</p>
+                        <p>Skill Level: {{ skill_level }}</p>
+                        <p>Achievements: {{ achievements_count }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/xterm.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/addons/fit/fit.min.js"></script>
+<script>
+    // Initialize Terminal
+    Terminal.applyAddon(fit);
+    var term = new Terminal({
+        cursorBlink: true,
+        fontSize: 14,
+        fontFamily: 'Menlo, Monaco, "Courier New", monospace'
+    });
+    term.open(document.getElementById('terminal'));
+    term.fit();
+    term.write('Welcome to Kali Linux Learning Environment\r\n$ ');
+
+    // Handle terminal input
+    term.on('key', function(key, ev) {
+        if (ev.keyCode === 13) { // Enter key
+            term.write('\r\n$ ');
+        } else {
+            term.write(key);
+        }
+    });
+
+    function startLab(labId) {
+        fetch(`/kali/lab/${labId}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('current-lab-title').textContent = data.title;
+            document.getElementById('lab-description').innerHTML = data.description;
+            term.clear();
+            term.write(`Starting lab: ${data.title}\r\n$ `);
+        });
+    }
+
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        term.fit();
+    });
+</script>
+{% endblock %}
+{% endblock %}

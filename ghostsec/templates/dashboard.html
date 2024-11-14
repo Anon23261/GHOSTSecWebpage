@@ -1,0 +1,112 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Welcome, {{ current_user.username }}!</h1>
+    
+    <div class="row">
+        <!-- Progress Overview -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Your Progress</h5>
+                </div>
+                <div class="card-body">
+                    <div class="progress mb-3">
+                        <div class="progress-bar" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100">65%</div>
+                    </div>
+                    <p class="card-text">Keep up the great work! You're making excellent progress.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-check-circle text-success"></i> Completed Python Basics</li>
+                        <li class="mb-2"><i class="fas fa-trophy text-warning"></i> Earned Security Badge</li>
+                        <li class="mb-2"><i class="fas fa-flag text-danger"></i> Solved CTF Challenge</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('learning.courses') }}" class="btn btn-outline-primary">Continue Learning</a>
+                        <a href="{{ url_for('ctf.challenges') }}" class="btn btn-outline-danger">Try CTF Challenge</a>
+                        <a href="{{ url_for('forum.discussions') }}" class="btn btn-outline-success">Join Discussion</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Learning Path Progress -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="card-title mb-0">Your Learning Path</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Course</th>
+                                    <th>Progress</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Cybersecurity Fundamentals</td>
+                                    <td>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-success">Completed</span></td>
+                                    <td><a href="#" class="btn btn-sm btn-outline-primary">Review</a></td>
+                                </tr>
+                                <tr>
+                                    <td>Network Security</td>
+                                    <td>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-warning" role="progressbar" style="width: 60%"></div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-warning">In Progress</span></td>
+                                    <td><a href="#" class="btn btn-sm btn-primary">Continue</a></td>
+                                </tr>
+                                <tr>
+                                    <td>Ethical Hacking</td>
+                                    <td>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-danger" role="progressbar" style="width: 0%"></div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-secondary">Not Started</span></td>
+                                    <td><a href="#" class="btn btn-sm btn-success">Start</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

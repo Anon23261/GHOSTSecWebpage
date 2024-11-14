@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="jumbotron text-center">
+    <h1 class="display-4">Welcome to GHOSTSec</h1>
+    <p class="lead">Your comprehensive platform for cybersecurity education and community engagement.</p>
+    <hr class="my-4">
+    <p>Join our community to access courses, CTF challenges, marketplace, and more!</p>
+    {% if not current_user.is_authenticated %}
+    <p class="lead">
+        <a class="btn btn-primary btn-lg" href="{{ url_for('auth.register') }}" role="button">Get Started</a>
+    </p>
+    {% endif %}
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Learn Cybersecurity</h5>
+                <p class="card-text">Access our comprehensive learning resources and structured courses.</p>
+                <a href="{{ url_for('learning.index') }}" class="btn btn-primary">Explore Courses</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">CTF Challenges</h5>
+                <p class="card-text">Test your skills with our Capture The Flag challenges.</p>
+                <a href="{{ url_for('ctf.index') }}" class="btn btn-primary">View Challenges</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Marketplace</h5>
+                <p class="card-text">Browse and purchase cybersecurity tools and resources.</p>
+                <a href="{{ url_for('marketplace.index') }}" class="btn btn-primary">Visit Marketplace</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

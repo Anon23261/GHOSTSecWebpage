@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHOSTSec - Python & Cybersecurity</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <h1>GHOSTSec</h1>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('python_cyber') }}" class="active">Python & Cybersecurity</a></li>
+                <li><a href="{{ url_for('software_eng') }}">Software Engineering</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="content">
+            <h2>Python & Cybersecurity Resources</h2>
+            
+            <div class="resource-section">
+                <h3>Python Fundamentals</h3>
+                <ul>
+                    <li>Basic Python Syntax</li>
+                    <li>Object-Oriented Programming</li>
+                    <li>Python Libraries for Security</li>
+                    <li>Network Programming with Python</li>
+                </ul>
+            </div>
+
+            <div class="resource-section">
+                <h3>Cybersecurity Topics</h3>
+                <ul>
+                    <li>Network Security</li>
+                    <li>Penetration Testing</li>
+                    <li>Cryptography</li>
+                    <li>Security Tools Development</li>
+                </ul>
+            </div>
+
+            <div class="resource-section">
+                <h3>Practical Examples</h3>
+                <ul>
+                    <li>Building Security Tools</li>
+                    <li>Vulnerability Assessment</li>
+                    <li>Security Automation</li>
+                    <li>Threat Detection</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 GHOSTSec. All rights reserved.</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,134 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Left Sidebar: Course Navigation -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Python Learning Path</h4>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="#basics" class="list-group-item list-group-item-action">Python Basics</a>
+                        <a href="#data-structures" class="list-group-item list-group-item-action">Data Structures</a>
+                        <a href="#functions" class="list-group-item list-group-item-action">Functions & OOP</a>
+                        <a href="#security" class="list-group-item list-group-item-action">Security Concepts</a>
+                        <a href="#networking" class="list-group-item list-group-item-action">Networking</a>
+                        <a href="#web" class="list-group-item list-group-item-action">Web Development</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div id="lesson-content">
+                        <h2>Welcome to Python Learning</h2>
+                        <p>Select a topic from the sidebar to begin learning.</p>
+                        
+                        <!-- Code Editor -->
+                        <div class="card mt-4">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Code Editor</h5>
+                                <button class="btn btn-primary btn-sm" onclick="runCode()">Run Code</button>
+                            </div>
+                            <div class="card-body">
+                                <div id="editor" style="height: 300px;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Output Console -->
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">Output</h5>
+                            </div>
+                            <div class="card-body">
+                                <pre id="output" class="bg-dark text-light p-3" style="height: 150px; overflow-y: auto;">
+# Output will appear here
+                                </pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar: Exercise & Progress -->
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Exercises</h4>
+                </div>
+                <div class="card-body">
+                    <div class="exercise-list">
+                        {% for exercise in exercises %}
+                        <div class="exercise-item mb-3">
+                            <h5>{{ exercise.title }}</h5>
+                            <p>{{ exercise.description }}</p>
+                            <button class="btn btn-sm btn-outline-primary" onclick="loadExercise('{{ exercise.id }}')">
+                                Start Exercise
+                            </button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Your Progress</h4>
+                </div>
+                <div class="card-body">
+                    <div class="progress mb-3">
+                        <div class="progress-bar" role="progressbar" style="width: {{ progress }}%">
+                            {{ progress }}%
+                        </div>
+                    </div>
+                    <div class="stats">
+                        <p>Completed Exercises: {{ completed_exercises }}/{{ total_exercises }}</p>
+                        <p>Points Earned: {{ points }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+<script>
+    // Initialize Ace Editor
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+    editor.session.setMode("ace/mode/python");
+    editor.setValue("# Write your Python code here\n");
+
+    function runCode() {
+        const code = editor.getValue();
+        fetch('/python/run_code', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ code: code })
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('output').textContent = data.output;
+        });
+    }
+
+    function loadExercise(exerciseId) {
+        fetch(`/python/exercise/${exerciseId}`)
+        .then(response => response.json())
+        .then(data => {
+            editor.setValue(data.starter_code);
+            document.getElementById('lesson-content').innerHTML = data.description;
+        });
+    }
+</script>
+{% endblock %}
+{% endblock %}

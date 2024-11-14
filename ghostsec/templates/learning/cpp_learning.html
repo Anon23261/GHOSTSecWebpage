@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">C/C++ Programming Learning</h1>
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        <strong>Note:</strong> All code is executed in a secure sandbox environment with memory and time constraints.
+    </div>
+
+    <div class="row">
+        {% for exercise in exercises %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 {% if exercise in completed_exercises %}border-success{% endif %}">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ exercise.title }}</h5>
+                    <div>
+                        <span class="badge bg-secondary me-2">{{ exercise.language }}</span>
+                        <span class="badge bg-{{ 'success' if exercise.difficulty == 'Beginner' else 'warning' if exercise.difficulty == 'Intermediate' else 'danger' }}">
+                            {{ exercise.difficulty }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ exercise.description }}</p>
+                    <p><strong>Category:</strong> {{ exercise.category }}</p>
+                    <p><strong>Security Focus:</strong></p>
+                    <ul>
+                        {% for focus in exercise.security_focus.split('\n') %}
+                        {% if focus.strip() %}
+                        <li>{{ focus.strip() }}</li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                    {% if exercise.memory_constraints %}
+                    <p><strong>Memory Constraints:</strong> {{ exercise.memory_constraints }}</p>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    {% if exercise in completed_exercises %}
+                    <button class="btn btn-success w-100" disabled>
+                        <i class="fas fa-check-circle"></i> Completed
+                    </button>
+                    {% else %}
+                    <a href="{{ url_for('learning.cpp_exercise', exercise_id=exercise.id) }}" class="btn btn-primary w-100">
+                        Start Exercise
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}

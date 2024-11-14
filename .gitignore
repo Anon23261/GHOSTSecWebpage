@@ -1,0 +1,17 @@
+*.pyc
+__pycache__/
+.env
+*.db
+instance/
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+.idea/
+.vscode/
+*.log
+uploads/
+venv/
+ghostsec.db

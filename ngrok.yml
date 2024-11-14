@@ -1,0 +1,7 @@
+version: "2"
+authtoken: "2op8hUgBXaJSyTk58Ie4p0kWhmJ_beoLuKdhCNN6sXvoi3Rf"
+tunnels:
+  ghostsec:
+    proto: http
+    addr: 80
+    hostname: turtle-smashing-informally.ngrok-free.app

@@ -1,0 +1,138 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-5">CTF Challenges</h1>
+    
+    <!-- Challenge Categories -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Web Security</h5>
+                    <p class="card-text">Test your web application security skills with SQL injection, XSS, and CSRF challenges.</p>
+                    <a href="#web-challenges" class="btn btn-primary">Start Web Challenges</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Cryptography</h5>
+                    <p class="card-text">Solve encryption puzzles and break codes in our cryptography challenges.</p>
+                    <a href="#crypto-challenges" class="btn btn-primary">Start Crypto Challenges</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Reverse Engineering</h5>
+                    <p class="card-text">Analyze and reverse engineer binaries to find hidden flags.</p>
+                    <a href="#reverse-challenges" class="btn btn-primary">Start Reverse Challenges</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="mb-0">Leaderboard</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Player</th>
+                            <th>Points</th>
+                            <th>Challenges Completed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for player in leaderboard %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ player.username }}</td>
+                            <td>{{ player.points }}</td>
+                            <td>{{ player.completed }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Challenges -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="mb-0">Active Challenges</h3>
+        </div>
+        <div class="card-body">
+            {% for challenge in challenges %}
+            <div class="challenge-card mb-3">
+                <h4>{{ challenge.title }}</h4>
+                <p>{{ challenge.description }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="badge bg-primary">Points: {{ challenge.points }}</span>
+                    <button class="btn btn-success btn-sm" onclick="submitFlag('{{ challenge.id }}')">Submit Flag</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Flag Submission Modal -->
+<div class="modal fade" id="flagModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Submit Flag</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="form-control" id="flagInput" placeholder="Enter flag">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="checkFlag()">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+function submitFlag(challengeId) {
+    $('#flagModal').modal('show');
+    window.currentChallengeId = challengeId;
+}
+
+function checkFlag() {
+    const flag = document.getElementById('flagInput').value;
+    fetch('/ctf/check_flag', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            challenge_id: window.currentChallengeId,
+            flag: flag
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.correct) {
+            alert('Congratulations! Flag is correct!');
+            location.reload();
+        } else {
+            alert('Incorrect flag. Try again!');
+        }
+    });
+}
+</script>
+{% endblock %}
+{% endblock %}

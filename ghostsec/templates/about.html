@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="text-center mb-4">About GhostSec</h1>
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="card-title">Our Mission</h2>
+                    <p class="card-text">
+                        GhostSec is dedicated to providing high-quality cybersecurity education and training to individuals 
+                        and organizations. Our platform combines theoretical knowledge with practical exercises to create 
+                        a comprehensive learning experience.
+                    </p>
+                    
+                    <h2 class="card-title mt-4">What We Offer</h2>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <i class="fas fa-graduation-cap"></i> Comprehensive Learning Paths
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-flag"></i> Capture The Flag (CTF) Challenges
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-comments"></i> Community Forum
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-store"></i> Marketplace for Security Tools
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-newspaper"></i> Latest Security News
+                        </li>
+                    </ul>
+                    
+                    <h2 class="card-title mt-4">Join Our Community</h2>
+                    <p class="card-text">
+                        Whether you're a beginner or an experienced professional, GhostSec provides the resources and 
+                        community support you need to advance your cybersecurity skills.
+                    </p>
+                    
+                    <div class="text-center mt-4">
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Join Now</a>
+                        <a href="{{ url_for('main.home') }}" class="btn btn-outline-secondary ml-2">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

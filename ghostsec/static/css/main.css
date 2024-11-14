@@ -1,0 +1,70 @@
+/* Main styles */
+body {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* Navbar customization */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+/* Card styles */
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+/* Custom button styles */
+.btn {
+    border-radius: 0.25rem;
+}
+
+/* Progress bar customization */
+.progress {
+    height: 0.8rem;
+    border-radius: 0.25rem;
+}
+
+/* Badge customization */
+.badge {
+    padding: 0.5em 0.75em;
+}
+
+/* Table customization */
+.table th {
+    border-top: none;
+}
+
+/* Alert customization */
+.alert {
+    border: none;
+    border-radius: 0.25rem;
+}
+
+/* Footer styles */
+.footer {
+    margin-top: auto;
+    padding: 1rem 0;
+    background-color: #343a40;
+    color: #fff;
+}
+
+/* Custom utilities */
+.shadow-sm {
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075) !important;
+}
+
+.shadow {
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important;
+}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHOSTSec - Software Engineering</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <h1>GHOSTSec</h1>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('python_cyber') }}">Python & Cybersecurity</a></li>
+                <li><a href="{{ url_for('software_eng') }}" class="active">Software Engineering</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="content">
+            <h2>Software Engineering Resources</h2>
+            
+            <div class="resource-section">
+                <h3>Development Practices</h3>
+                <ul>
+                    <li>Clean Code Principles</li>
+                    <li>Design Patterns</li>
+                    <li>Test-Driven Development</li>
+                    <li>Agile Methodologies</li>
+                </ul>
+            </div>
+
+            <div class="resource-section">
+                <h3>Tools & Technologies</h3>
+                <ul>
+                    <li>Version Control (Git)</li>
+                    <li>CI/CD Pipelines</li>
+                    <li>Development Environments</li>
+                    <li>Code Review Practices</li>
+                </ul>
+            </div>
+
+            <div class="resource-section">
+                <h3>Architecture & Design</h3>
+                <ul>
+                    <li>System Architecture</li>
+                    <li>Microservices</li>
+                    <li>API Design</li>
+                    <li>Database Design</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 GHOSTSec. All rights reserved.</p>
+    </footer>
+</body>
+</html>
