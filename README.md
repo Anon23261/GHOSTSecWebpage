@@ -1,15 +1,54 @@
 # GhostSec - Cybersecurity Learning Platform
 
-A Flask-based web application for cybersecurity education and training.
+GhostSec is a comprehensive cybersecurity learning and testing platform that provides isolated environments for various security disciplines, including malware analysis, penetration testing, bug bounty hunting, and secure programming.
 
 ## Features
 
-- User Authentication (Login/Register)
-- User Dashboard
-- Email Integration
-- Rate Limiting
-- Secure Password Handling
-- Error Logging
+### Learning Environments
+
+1. **Malware Analysis Lab**
+   - Secure sandboxed environment
+   - Static and dynamic analysis tools
+   - YARA rule scanning
+   - Network activity monitoring
+   - Comprehensive reporting
+
+2. **Bug Bounty Lab**
+   - Kali Linux-based environment
+   - Common security tools
+   - Vulnerable practice applications
+   - Structured challenges
+   - Point-based progression
+
+3. **Penetration Testing Lab**
+   - Full Kali Linux toolkit
+   - Network isolation
+   - Vulnerable target systems
+   - Advanced scanning tools
+   - Exploitation frameworks
+
+4. **Programming Environments**
+   - Python development environment
+   - C/C++ development environment
+   - C# development environment
+   - Code analysis tools
+   - Secure testing frameworks
+
+### Security Features
+
+- Docker-based isolation
+- Network separation
+- Controlled execution
+- Resource monitoring
+- Comprehensive logging
+
+## Requirements
+
+- Python 3.10+
+- Docker
+- 8GB RAM minimum (16GB recommended)
+- 50GB free disk space
+- Windows/Linux operating system
 
 ## Installation
 
@@ -19,71 +58,101 @@ git clone https://github.com/yourusername/ghostsec.git
 cd ghostsec
 ```
 
-2. Create a virtual environment and activate it:
-```bash
-python -m venv venv
-venv\Scripts\activate  # Windows
-source venv/bin/activate  # Linux/Mac
-```
-
-3. Install dependencies:
+2. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Configure environment variables:
-- Copy `.env.example` to `.env`
-- Update the values in `.env` with your configuration
+3. Install Docker if not already installed:
+   - [Docker Desktop for Windows](https://docs.docker.com/desktop/windows/install/)
+   - [Docker for Linux](https://docs.docker.com/engine/install/)
 
-5. Initialize the database:
+4. Configure environment:
 ```bash
-python
->>> from app import db
->>> db.create_all()
->>> exit()
+cp .env.example .env
+# Edit .env with your settings
 ```
 
-6. Run the application:
+5. Initialize the application:
 ```bash
-python app.py
+python setup.py install
 ```
 
-The application will be available at `http://localhost:5000`
+## Usage
 
-## Project Structure
-
-```
-ghostsec/
-├── app.py              # Application initialization
-├── models.py           # Database models
-├── routes.py           # Route handlers
-├── requirements.txt    # Project dependencies
-├── .env               # Environment variables
-├── instance/          # Instance-specific files
-├── logs/              # Application logs
-├── static/            # Static files (CSS, JS)
-├── templates/         # HTML templates
-└── uploads/           # User uploads
-```
-
-## Development
-
-1. Set up environment variables in `.env`:
-```
-SECRET_KEY=your_secret_key
-DATABASE_URL=sqlite:///ghostsec.db
-MAIL_SERVER=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USE_TLS=True
-MAIL_USERNAME=your_email@gmail.com
-MAIL_PASSWORD=your_app_password
-```
-
-2. Run in development mode:
+1. Start the platform:
 ```bash
-python app.py
+python ghostsec_app.py
 ```
+
+2. Access the web interface:
+```
+http://localhost:5000
+```
+
+3. Create learning environments:
+```python
+from ghostsec.learning_environments import MalwareLab, BugBountyLab, PentestingLab
+
+# Create malware analysis lab
+malware_lab = MalwareLab("my_workspace")
+malware_lab.setup_environment()
+
+# Create bug bounty lab
+bounty_lab = BugBountyLab("bug_bounty")
+bounty_lab.setup_environment()
+
+# Create pentesting lab
+pentest_lab = PentestingLab("pentest")
+pentest_lab.setup_environment()
+```
+
+## Security Considerations
+
+1. **Isolation**: All environments run in isolated Docker containers
+2. **Network Security**: Separate networks for different environments
+3. **Resource Control**: Limited resource allocation per container
+4. **Access Control**: Role-based access to different environments
+5. **Monitoring**: Comprehensive logging and activity monitoring
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
-MIT License
+This project is licensed under the MIT License with additional terms - see the [LICENSE](LICENSE) file for details.
+
+## Disclaimer
+
+This software is intended for educational and research purposes only. Users are responsible for complying with all applicable laws and regulations. The creators are not responsible for any misuse of this software.
+
+## Support
+
+For support, please open an issue in the GitHub repository or contact the maintainers directly.
+
+## Acknowledgments
+
+- Docker for containerization
+- Kali Linux for security tools
+- Various open-source security tools and frameworks
+
+## Roadmap
+
+- [ ] Web interface for environment management
+- [ ] Advanced reporting and analytics
+- [ ] Machine learning-based threat detection
+- [ ] Additional specialized learning modules
+- [ ] Enhanced user interaction features
+
+## Authors
+
+- Your Name (@yourusername)
+
+## Project Status
+
+Active development - Contributions welcome!
