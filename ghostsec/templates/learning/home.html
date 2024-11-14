@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Learning Path</h1>
+    
+    {% if modules %}
+        <div class="row">
+            {% for module in modules %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ module.title }}</h5>
+                            <p class="card-text">{{ module.description }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="{{ url_for('learning.module', module_id=module.id) }}" class="btn btn-primary">Start Learning</a>
+                                <span class="badge bg-secondary">{{ module.category }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            No learning modules available yet. Check back soon!
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

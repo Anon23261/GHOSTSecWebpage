@@ -16,18 +16,26 @@ load_dotenv()
 
 # Initialize Flask extensions
 db = SQLAlchemy()
+bcrypt = Bcrypt()
+login_manager = LoginManager()
+login_manager.login_view = 'auth.login'
+login_manager.login_message_category = 'info'
 socketio = SocketIO()
 mail = Mail()
 migrate = Migrate()
-bcrypt = Bcrypt()
-login_manager = LoginManager()
 
 # Initialize rate limiter with Redis storage
+redis_url = os.getenv('REDIS_URL')
+if redis_url and redis_url.startswith('rediss://'):
+    # For SSL Redis connections, use redis:// and handle SSL in storage options
+    storage_uri = redis_url.replace('rediss://', 'redis://')
+else:
+    storage_uri = redis_url if redis_url else "memory://"
+
 limiter = Limiter(
     key_func=get_remote_address,
     default_limits=["200 per day", "50 per hour"],
-    storage_uri=os.getenv('REDIS_URL', "memory://"),
-    storage_options={"ssl": True}  # Enable SSL for Redis connection
+    storage_uri=storage_uri
 )
 api = Api()
 
@@ -66,12 +74,12 @@ def create_app():
     limiter.init_app(app)
     api.init_app(app)
     
-    # Register blueprints
-    from ghostsec.auth import auth as auth_blueprint
-    app.register_blueprint(auth_blueprint, url_prefix='/auth')
-    
+    # Import and register blueprints
     from ghostsec.main import main as main_blueprint
     app.register_blueprint(main_blueprint)
+    
+    from ghostsec.auth import auth as auth_blueprint
+    app.register_blueprint(auth_blueprint, url_prefix='/auth')
     
     from ghostsec.oauth import oauth as oauth_blueprint
     from ghostsec.oauth.routes import github_blueprint, google_blueprint
@@ -93,10 +101,6 @@ def create_app():
     
     from ghostsec.news import news as news_blueprint
     app.register_blueprint(news_blueprint, url_prefix='/news')
-    
-    # Configure login manager
-    login_manager.login_view = 'auth.login'
-    login_manager.login_message_category = 'info'
     
     # Initialize database
     with app.app_context():

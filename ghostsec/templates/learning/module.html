@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('learning.learn_home') }}">Learning Path</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ module.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="card">
+        <div class="card-body">
+            <h1 class="card-title">{{ module.title }}</h1>
+            <p class="text-muted">{{ module.category }}</p>
+            
+            <div class="progress mb-4">
+                <div class="progress-bar" role="progressbar" style="width: {{ progress.progress_percent }}%"
+                     aria-valuenow="{{ progress.progress_percent }}" aria-valuemin="0" aria-valuemax="100">
+                    {{ progress.progress_percent }}%
+                </div>
+            </div>
+
+            <div class="module-content">
+                {{ module.content | safe }}
+            </div>
+
+            {% if module.prerequisites %}
+            <div class="mt-4">
+                <h4>Prerequisites</h4>
+                <p>{{ module.prerequisites }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+// Function to update progress
+function updateProgress(progress) {
+    fetch("{{ url_for('learning.track_progress', module_id=module.id) }}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ progress: progress })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update progress bar
+            const progressBar = document.querySelector('.progress-bar');
+            progressBar.style.width = `${progress}%`;
+            progressBar.setAttribute('aria-valuenow', progress);
+            progressBar.textContent = `${progress}%`;
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// Track scroll progress
+document.addEventListener('scroll', () => {
+    const content = document.querySelector('.module-content');
+    const contentHeight = content.offsetHeight;
+    const scrollPosition = window.scrollY;
+    const windowHeight = window.innerHeight;
+    
+    // Calculate progress percentage
+    const progress = Math.min(
+        Math.round((scrollPosition / (contentHeight - windowHeight)) * 100),
+        100
+    );
+    
+    updateProgress(progress);
+});
+</script>
+{% endblock %}
+{% endblock %}
