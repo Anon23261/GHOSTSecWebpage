@@ -3,11 +3,13 @@ services:
     name: ghostsec
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: python run_production.py
+    startCommand: gunicorn wsgi:app
     envVars:
       - key: PYTHON_VERSION
-        value: 3.10.0
+        value: 3.11.0
       - key: SECRET_KEY
         generateValue: true
       - key: FLASK_ENV
         value: production
+      - key: PYTHONPATH
+        value: .
