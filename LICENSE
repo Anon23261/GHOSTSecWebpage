@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2024 GhostSec
+Copyright (c) 2024 GhostSec Platform
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,9 +20,56 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Additional Terms:
+Additional Terms and Conditions:
 
-1. This software is intended for educational and research purposes only.
-2. Users are responsible for complying with all applicable laws and regulations.
-3. The creators are not responsible for any misuse of this software.
-4. Use of this software for malicious purposes is strictly prohibited.
+1. Educational and Research Use
+   This software is intended for educational and research purposes only. Any use
+   of this software for malicious purposes or activities that violate applicable
+   laws is strictly prohibited.
+
+2. User Responsibilities
+   Users are solely responsible for:
+   a) Complying with all applicable local, state, national, and international laws
+      and regulations.
+   b) Obtaining any necessary permissions before testing or analyzing any systems
+      or networks.
+   c) Ensuring proper isolation and containment when analyzing malicious software
+      or conducting security testing.
+
+3. Liability and Warranty Disclaimer
+   a) The creators, contributors, and maintainers of this software are not
+      responsible for any misuse, damage, or legal consequences arising from the
+      use of this software.
+   b) This software is provided without any warranty regarding its security,
+      reliability, or effectiveness for any particular purpose.
+
+4. Usage Restrictions
+   The software may not be used for:
+   a) Unauthorized access to systems or networks
+   b) Distribution of malware or harmful code
+   c) Activities that disrupt services or violate privacy
+   d) Any illegal or malicious purposes
+
+5. Data Collection and Privacy
+   Users must:
+   a) Respect privacy laws and regulations
+   b) Obtain proper consent before collecting or processing personal data
+   c) Implement appropriate data protection measures
+   d) Comply with relevant data protection regulations (e.g., GDPR, CCPA)
+
+6. Attribution and Modifications
+   a) Any modifications or derivatives of this software must maintain all
+      copyright notices, disclaimers, and additional terms.
+   b) Attribution to the original project must be maintained in any derivative
+      works.
+
+7. Commercial Use
+   While commercial use is permitted under the MIT License, users must ensure
+   compliance with all additional terms and conditions specified herein.
+
+8. Termination
+   Your rights under this license will terminate automatically if you fail to
+   comply with any of its terms or conditions.
+
+By using this software, you acknowledge that you have read, understood, and
+agree to be bound by these terms and conditions.

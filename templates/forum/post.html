@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('social.forum') }}">Forum</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('social.forum_category', category_id=post.category.id) }}">
+                            {{ post.category.name }}
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        {{ post.title }}
+                    </li>
+                </ol>
+            </nav>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="post-header mb-3">
+                        <h2 class="card-title">{{ post.title }}</h2>
+                        <div class="post-meta">
+                            <div class="author-info">
+                                <img src="{{ post.author.avatar_url }}" alt="Avatar" class="avatar">
+                                <span class="author-name">{{ post.author.username }}</span>
+                            </div>
+                            <div class="post-stats">
+                                <span class="stat">
+                                    <i class="fas fa-heart"></i> {{ post.likes }}
+                                </span>
+                                <span class="stat">
+                                    <i class="fas fa-eye"></i> {{ post.views }}
+                                </span>
+                                <span class="stat">
+                                    <i class="fas fa-clock"></i>
+                                    {{ post.date_posted.strftime('%Y-%m-%d %H:%M') }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="post-content">
+                        {{ post.content|safe }}
+                    </div>
+
+                    {% if current_user.is_authenticated %}
+                    <div class="post-actions mt-3">
+                        <button class="btn btn-outline-danger btn-sm like-btn" data-post-id="{{ post.id }}">
+                            <i class="fas fa-heart"></i> Like
+                        </button>
+                        {% if current_user.id == post.author_id %}
+                        <button class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="comments-section">
+                <h3>Comments</h3>
+                {% if current_user.is_authenticated %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('social.add_comment', post_id=post.id) }}">
+                            <div class="form-group">
+                                <textarea class="form-control" name="content" rows="3" placeholder="Write a comment..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-2">
+                                Post Comment
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% for comment in post.comments %}
+                <div class="comment card mb-2">
+                    <div class="card-body">
+                        <div class="comment-header">
+                            <div class="author-info">
+                                <img src="{{ comment.author.avatar_url }}" alt="Avatar" class="avatar-sm">
+                                <span class="author-name">{{ comment.author.username }}</span>
+                            </div>
+                            <small class="text-muted">
+                                {{ comment.date_posted.strftime('%Y-%m-%d %H:%M') }}
+                            </small>
+                        </div>
+                        <div class="comment-content mt-2">
+                            {{ comment.content }}
+                        </div>
+                        {% if current_user.is_authenticated %}
+                        <div class="comment-actions mt-2">
+                            <button class="btn btn-outline-danger btn-sm like-btn" data-comment-id="{{ comment.id }}">
+                                <i class="fas fa-heart"></i> {{ comment.likes }}
+                            </button>
+                            {% if current_user.id == comment.author_id %}
+                            <button class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    No comments yet. Be the first to comment!
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.post-header {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+}
+
+.post-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.author-info {
+    display: flex;
+    align-items: center;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.avatar-sm {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.post-stats {
+    display: flex;
+    gap: 1rem;
+}
+
+.stat {
+    color: #7f8c8d;
+}
+
+.stat i {
+    margin-right: 4px;
+}
+
+.post-content {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin: 1rem 0;
+}
+
+.comment {
+    background-color: #f8f9fa;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.like-btn {
+    transition: all 0.2s;
+}
+
+.like-btn:hover {
+    transform: scale(1.05);
+}
+
+.like-btn i {
+    color: #e74c3c;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Like post functionality
+    const postLikeBtn = document.querySelector('.like-btn[data-post-id]');
+    if (postLikeBtn) {
+        postLikeBtn.addEventListener('click', function() {
+            const postId = this.dataset.postId;
+            fetch(`/api/post/${postId}/like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const likeCount = this.querySelector('span');
+                if (likeCount) {
+                    likeCount.textContent = data.likes;
+                }
+            });
+        });
+    }
+
+    // Like comment functionality
+    const commentLikeBtns = document.querySelectorAll('.like-btn[data-comment-id]');
+    commentLikeBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const commentId = this.dataset.commentId;
+            fetch(`/api/comment/${commentId}/like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const likeCount = this.querySelector('span');
+                if (likeCount) {
+                    likeCount.textContent = data.likes;
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

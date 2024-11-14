@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>GhostSec Forum</h1>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('social.new_post') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> New Post
+                </a>
+                {% endif %}
+            </div>
+
+            {% for category in categories %}
+            <div class="card mb-3">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">
+                        <a href="{{ url_for('social.forum_category', category_id=category.id) }}" class="text-white text-decoration-none">
+                            {{ category.name }}
+                        </a>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ category.description }}</p>
+                    <div class="d-flex justify-content-between">
+                        <small class="text-muted">
+                            {{ category.posts|length }} posts
+                        </small>
+                        {% if category.posts %}
+                        <small class="text-muted">
+                            Latest: {{ category.posts[-1].date_posted.strftime('%Y-%m-%d %H:%M') }}
+                        </small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.card-header {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.btn-primary {
+    background-color: #2c3e50;
+    border-color: #2c3e50;
+}
+
+.btn-primary:hover {
+    background-color: #34495e;
+    border-color: #34495e;
+}
+</style>
+{% endblock %}

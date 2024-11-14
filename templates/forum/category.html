@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('social.forum') }}">Forum</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        {{ category.name }}
+                    </li>
+                </ol>
+            </nav>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>{{ category.name }}</h2>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('social.new_post') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> New Post
+                </a>
+                {% endif %}
+            </div>
+
+            {% for post in posts %}
+            <div class="card mb-3 post-card {% if post.is_pinned %}pinned{% endif %}">
+                {% if post.is_pinned %}
+                <div class="pinned-badge">
+                    <i class="fas fa-thumbtack"></i> Pinned
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="post-stats text-center me-3">
+                            <div class="likes">
+                                <i class="fas fa-heart"></i>
+                                <span>{{ post.likes }}</span>
+                            </div>
+                            <div class="views">
+                                <i class="fas fa-eye"></i>
+                                <span>{{ post.views }}</span>
+                            </div>
+                        </div>
+                        <div class="post-content">
+                            <h5 class="card-title">
+                                <a href="{{ url_for('social.view_post', post_id=post.id) }}" class="text-decoration-none">
+                                    {{ post.title }}
+                                </a>
+                            </h5>
+                            <p class="card-text text-muted">
+                                {{ post.content[:200] }}{% if post.content|length > 200 %}...{% endif %}
+                            </p>
+                            <div class="post-meta">
+                                <small class="text-muted">
+                                    Posted by {{ post.author.username }}
+                                    on {{ post.date_posted.strftime('%Y-%m-%d %H:%M') }}
+                                </small>
+                                <small class="text-muted ms-2">
+                                    {{ post.comments|length }} comments
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                No posts in this category yet.
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.post-card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+    position: relative;
+}
+
+.post-card:hover {
+    transform: translateY(-2px);
+}
+
+.post-card.pinned {
+    border-left: 4px solid #e74c3c;
+}
+
+.pinned-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #e74c3c;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+.post-stats {
+    min-width: 60px;
+}
+
+.post-stats .likes,
+.post-stats .views {
+    margin-bottom: 8px;
+}
+
+.post-stats i {
+    display: block;
+    color: #95a5a6;
+    margin-bottom: 2px;
+}
+
+.post-content {
+    flex-grow: 1;
+}
+
+.btn-primary {
+    background-color: #2c3e50;
+    border-color: #2c3e50;
+}
+
+.btn-primary:hover {
+    background-color: #34495e;
+    border-color: #34495e;
+}
+
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+    margin-bottom: 1rem;
+}
+
+.breadcrumb-item a {
+    color: #2c3e50;
+    text-decoration: none;
+}
+
+.breadcrumb-item.active {
+    color: #7f8c8d;
+}
+</style>
+{% endblock %}

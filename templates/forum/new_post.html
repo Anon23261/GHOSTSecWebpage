@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('social.forum') }}">Forum</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        New Post
+                    </li>
+                </ol>
+            </nav>
+
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">Create New Post</h2>
+                    <form method="POST" action="{{ url_for('social.new_post') }}">
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Category</label>
+                            <select class="form-select" id="category" name="category_id" required>
+                                <option value="">Select a category</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}">{{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" name="title" 
+                                   placeholder="Enter post title" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Content</label>
+                            <textarea class="form-control" id="content" name="content" rows="10" 
+                                      placeholder="Write your post content here..." required></textarea>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="markdown" name="use_markdown">
+                            <label class="form-check-label" for="markdown">
+                                Enable Markdown formatting
+                            </label>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-secondary" onclick="previewPost()">
+                                Preview
+                            </button>
+                            <div>
+                                <button type="button" class="btn btn-outline-secondary me-2" onclick="saveDraft()">
+                                    Save as Draft
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    Publish Post
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="preview-section" class="card mt-4 d-none">
+                <div class="card-body">
+                    <h3 class="card-title">Preview</h3>
+                    <div id="preview-content" class="mt-3">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.form-control:focus,
+.form-select:focus {
+    border-color: #2c3e50;
+    box-shadow: 0 0 0 0.2rem rgba(44, 62, 80, 0.25);
+}
+
+#content {
+    resize: vertical;
+    min-height: 200px;
+}
+
+.preview-content {
+    padding: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+function previewPost() {
+    const content = document.getElementById('content').value;
+    const useMarkdown = document.getElementById('markdown').checked;
+    const previewSection = document.getElementById('preview-section');
+    const previewContent = document.getElementById('preview-content');
+
+    if (content.trim() === '') {
+        alert('Please enter some content to preview.');
+        return;
+    }
+
+    previewContent.innerHTML = useMarkdown ? marked.parse(content) : content;
+    previewSection.classList.remove('d-none');
+}
+
+function saveDraft() {
+    const title = document.getElementById('title').value;
+    const content = document.getElementById('content').value;
+    const categoryId = document.getElementById('category').value;
+
+    if (!title || !content || !categoryId) {
+        alert('Please fill in all required fields before saving as draft.');
+        return;
+    }
+
+    // Save draft to localStorage
+    const draft = {
+        title,
+        content,
+        categoryId,
+        timestamp: new Date().toISOString()
+    };
+
+    localStorage.setItem('forum_draft', JSON.stringify(draft));
+    alert('Draft saved successfully!');
+}
+
+// Load draft if exists
+document.addEventListener('DOMContentLoaded', function() {
+    const savedDraft = localStorage.getItem('forum_draft');
+    if (savedDraft) {
+        const draft = JSON.parse(savedDraft);
+        const timestamp = new Date(draft.timestamp);
+        const now = new Date();
+        const hoursSinceSave = Math.floor((now - timestamp) / (1000 * 60 * 60));
+
+        if (confirm(`You have a saved draft from ${hoursSinceSave} hours ago. Would you like to load it?`)) {
+            document.getElementById('title').value = draft.title;
+            document.getElementById('content').value = draft.content;
+            document.getElementById('category').value = draft.categoryId;
+        } else {
+            localStorage.removeItem('forum_draft');
+        }
+    }
+});
+</script>
+{% endblock %}
