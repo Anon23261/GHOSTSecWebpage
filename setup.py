@@ -1,83 +1,128 @@
 import os
 import sys
 from pathlib import Path
-from cryptography.fernet import Fernet
+from django.core.management.utils import get_random_secret_key
 
 def setup_environment():
+    """Set up GhostSec Django environment"""
     print("Setting up GhostSec environment...")
     
     # Get absolute paths
     base_dir = os.path.abspath(os.path.dirname(__file__))
-    instance_dir = os.path.join(base_dir, 'instance')
-    db_path = os.path.join(instance_dir, 'ghostsec.db')
     
-    # Create necessary directories with proper permissions
-    directories = ['logs', 'uploads', 'instance']
+    # Create necessary directories
+    directories = [
+        'logs',
+        'media',
+        'static',
+        'staticfiles',
+        os.path.join('ghostsec', 'static'),
+        os.path.join('ghostsec', 'media'),
+    ]
+    
     for directory in directories:
         dir_path = Path(os.path.join(base_dir, directory))
-        dir_path.mkdir(exist_ok=True)
-        # Ensure directory has write permissions
-        os.chmod(dir_path, 0o777)
+        dir_path.mkdir(exist_ok=True, parents=True)
         print(f"Created directory: {directory}")
-    
-    # Generate encryption key
-    encryption_key = Fernet.generate_key()
     
     # Environment variables
     env_vars = {
-        'SECRET_KEY': 'dev_secret_key_12345',
-        'DATABASE_URL': f'sqlite:///{db_path}',
-        'FLASK_APP': 'ghostsec',
-        'FLASK_ENV': 'development',
-        'DEBUG': 'True',
-        'ENCRYPTION_KEY': encryption_key.decode(),
-        'MAIL_SERVER': 'smtp.gmail.com',
-        'MAIL_PORT': '587',
-        'MAIL_USE_TLS': 'True',
-        'MAIL_USERNAME': 'your_email@gmail.com',
-        'MAIL_PASSWORD': 'your_app_password',
+        'DJANGO_SECRET_KEY': get_random_secret_key(),
+        'DJANGO_DEBUG': 'True',
+        'DJANGO_ALLOWED_HOSTS': 'localhost,127.0.0.1',
+        'DATABASE_URL': 'sqlite:///db.sqlite3',
+        'EMAIL_HOST': 'smtp.gmail.com',
+        'EMAIL_PORT': '587',
+        'EMAIL_USE_TLS': 'True',
+        'EMAIL_HOST_USER': 'your_email@gmail.com',
+        'EMAIL_HOST_PASSWORD': 'your_app_password',
         'ADMIN_EMAIL': 'admin@ghostsec.com',
-        'MAX_CONTENT_LENGTH': str(16 * 1024 * 1024),  # 16MB
-        'UPLOAD_FOLDER': os.path.join(base_dir, 'uploads'),
-        'RATELIMIT_STORAGE_URL': 'memory://',
-        'RATELIMIT_DEFAULT': '200/day;50/hour',
-        'RATELIMIT_HEADERS_ENABLED': 'True'
+        'MEDIA_ROOT': os.path.join(base_dir, 'media'),
+        'STATIC_ROOT': os.path.join(base_dir, 'staticfiles'),
     }
     
     # Write to .env file
-    with open(os.path.join(base_dir, '.env'), 'w') as f:
-        for key, value in env_vars.items():
-            f.write(f"{key}={value}\n")
-    print("Created .env file with default configuration")
+    env_path = os.path.join(base_dir, '.env')
+    if not os.path.exists(env_path):
+        with open(env_path, 'w') as f:
+            for key, value in env_vars.items():
+                f.write(f"{key}={value}\n")
+        print("Created .env file with default configuration")
+    else:
+        print(".env file already exists, skipping creation")
     
-    # Initialize database
-    print("Initializing database...")
-    try:
-        # Create the database directory if it doesn't exist
-        db_dir = Path(instance_dir)
-        db_dir.mkdir(exist_ok=True)
-        os.chmod(db_dir, 0o777)
-        
-        # Touch the database file to ensure it exists with proper permissions
-        with open(db_path, 'a') as f:
-            pass
-        os.chmod(db_path, 0o666)
-        
-        from init_db import init_database
-        init_database()
-    except Exception as e:
-        print(f"Error initializing database: {str(e)}")
-        return False
+    # Create a README if it doesn't exist
+    readme_path = os.path.join(base_dir, 'README.md')
+    if not os.path.exists(readme_path):
+        with open(readme_path, 'w') as f:
+            f.write("""# GhostSec Web Platform
+
+A Django-based cybersecurity learning and collaboration platform.
+
+## Setup Instructions
+
+1. Create a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # Linux/Mac
+   venv\\Scripts\\activate   # Windows
+   ```
+
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Run migrations:
+   ```bash
+   python manage.py migrate
+   ```
+
+4. Create a superuser:
+   ```bash
+   python manage.py createsuperuser
+   ```
+
+5. Run the development server:
+   ```bash
+   python manage.py runserver
+   ```
+
+## Features
+
+- User Authentication System
+- CTF (Capture The Flag) Module
+- Learning Environments
+- Malware Analysis Labs
+- Marketplace
+- Forum
+- News/Blog Section
+- Programming Exercises
+
+## Development
+
+- Framework: Django 4.2.7
+- Database: SQLite (default)
+- Static Files: WhiteNoise
+- Forms: Crispy Forms with Bootstrap 4
+
+## Deployment
+
+For deployment instructions, see `docs/deployment.md`.
+
+## License
+
+Copyright 2024 GhostSec. All rights reserved.
+""")
+        print("Created README.md file")
+    else:
+        print("README.md already exists, skipping creation")
     
-    print("\nSetup completed successfully!")
-    print("\nDefault admin credentials:")
-    print("Email: admin@ghostsec.com")
-    print("Password: Anonymous@23!")
     return True
 
 if __name__ == '__main__':
     if setup_environment():
-        print("\nYou can now run the application using:")
-        print("python debug_app.py")
-    else:
-        print("\nSetup failed. Please check the error messages above.")
+        print("\nSetup complete! You can now run the application using:")
+        print("python manage.py migrate")
+        print("python manage.py createsuperuser")
+        print("python manage.py runserver")
