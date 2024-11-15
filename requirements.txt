@@ -1,4 +1,10 @@
-Flask==2.3.3
+Django==4.2.7
+psycopg2-binary==2.9.9
+redis==5.0.1
+django-redis==5.4.0
+gunicorn==21.2.0
+flask==2.3.3
+flask-restful==0.3.10
 Flask-SQLAlchemy==3.1.1
 Flask-Login==0.6.2
 Flask-Mail==0.9.1
@@ -14,9 +20,6 @@ Werkzeug==2.3.7
 Jinja2==3.1.2
 itsdangerous==2.1.2
 click==8.1.7
-redis==5.0.1
-psycopg2-binary==2.9.9
-gunicorn==21.2.0
 eventlet==0.33.3
 bcrypt==4.0.1
 PyJWT==2.8.0
