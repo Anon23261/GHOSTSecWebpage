@@ -7,8 +7,7 @@ if project_home not in sys.path:
     sys.path.insert(0, project_home)
 
 # Set environment variables
-os.environ['DJANGO_SETTINGS_MODULE'] = 'ghostsec.settings.pythonanywhere'
-os.environ['PYTHONPATH'] = project_home
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ghostsec.settings.pythonanywhere')
 
 # Import Django WSGI handler
 from django.core.wsgi import get_wsgi_application

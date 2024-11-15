@@ -2,10 +2,6 @@
 GhostSec Django application initialization.
 """
 
-from django.apps import AppConfig
-
-default_app_config = 'ghostsec.apps.GhostSecConfig'
-
 # Celery configuration
 try:
     from .celery import app as celery_app
