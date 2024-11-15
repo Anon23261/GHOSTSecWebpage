@@ -19,9 +19,10 @@ DATABASES = {
 }
 
 # Static files configuration
-STATIC_ROOT = '/home/anonymous23/GhostSec/static'
+STATIC_ROOT = '/home/anonymous23/GhostSec/staticfiles'
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'ghostsec', 'static'),
     os.path.join(BASE_DIR, 'static'),
 ]
 
@@ -54,18 +55,22 @@ LOGGING = {
             'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
             'style': '{',
         },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
     },
     'handlers': {
         'file': {
-            'level': 'ERROR',
+            'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': '/home/anonymous23/GhostSec/django_error.log',
+            'filename': '/home/anonymous23/GhostSec/logs/django.log',
             'formatter': 'verbose',
         },
         'console': {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
+            'formatter': 'simple',
         },
     },
     'loggers': {
