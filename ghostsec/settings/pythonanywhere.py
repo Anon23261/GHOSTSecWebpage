@@ -62,10 +62,9 @@ LOGGING = {
     },
     'handlers': {
         'file': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/home/anonymous23/GhostSec/logs/django.log',
-            'formatter': 'verbose',
+            'filename': 'logs/django.log',
         },
         'console': {
             'level': 'INFO',
@@ -75,8 +74,8 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['file', 'console'],
-            'level': 'INFO',
+            'handlers': ['file'],
+            'level': 'DEBUG',
             'propagate': True,
         },
         'ghostsec': {

@@ -17,6 +17,23 @@ ENCRYPTION_KEY = get_encryption_key()
 cipher_suite = Fernet(ENCRYPTION_KEY)
 
 class User(AbstractUser):
+    groups = models.ManyToManyField(
+        'auth.Group',
+        verbose_name='groups',
+        blank=True,
+        help_text='The groups this user belongs to.',
+        related_name='ghostsec_user_set',
+        related_query_name='ghostsec_user',
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        verbose_name='user permissions',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        related_name='ghostsec_user_set',
+        related_query_name='ghostsec_user',
+    )
+    
     bio = models.TextField(max_length=500, blank=True)
     location = models.CharField(max_length=30, blank=True)
     birth_date = models.DateField(null=True, blank=True)
@@ -90,38 +107,6 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
-
-class ForumPost(models.Model):
-    title = models.CharField(max_length=100)
-    content = models.TextField()
-    date_posted = models.DateTimeField(default=timezone.now)
-    category = models.CharField(max_length=50)
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='posts')
-
-class ForumComment(models.Model):
-    content = models.TextField()
-    date_posted = models.DateTimeField(default=timezone.now)
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='comments')
-    post = models.ForeignKey(ForumPost, on_delete=models.CASCADE, related_name='comments')
-
-class CTFChallenge(models.Model):
-    title = models.CharField(max_length=100)
-    description = models.TextField()
-    category = models.CharField(max_length=50)
-    difficulty = models.CharField(max_length=20)
-    points = models.IntegerField()
-    flag = models.CharField(max_length=100)
-
-class CTFHint(models.Model):
-    content = models.TextField()
-    cost = models.IntegerField()
-    challenge = models.ForeignKey(CTFChallenge, on_delete=models.CASCADE, related_name='hints')
-
-class CTFScore(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='ctf_scores')
-    challenge = models.ForeignKey(CTFChallenge, on_delete=models.CASCADE, related_name='scores')
-    score = models.IntegerField()
-    completed_at = models.DateTimeField(default=timezone.now)
 
 class LearningModule(models.Model):
     title = models.CharField(max_length=100)
