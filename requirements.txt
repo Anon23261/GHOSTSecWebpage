@@ -1,3 +1,4 @@
+# Core Django Requirements
 Django==4.2.7
 django-allauth==0.58.2
 django-cors-headers==4.3.0
@@ -9,3 +10,39 @@ python-dotenv==1.0.0
 Pillow==10.1.0
 channels==4.0.0
 daphne==4.0.0
+
+# Security Requirements
+django-axes==6.1.1  # Login attempt security
+django-csp==3.7  # Content Security Policy
+django-secure==1.0.2  # Security middleware
+# Two-factor authentication
+django-two-factor-auth==1.15.5
+django-otp==1.3.0
+phonenumbers==8.13.26
+cryptography==41.0.5  # For encryption
+pyOpenSSL==23.3.0  # SSL/TLS toolkit
+
+# Performance & Monitoring
+django-debug-toolbar==4.2.0  # Development debugging
+sentry-sdk==1.32.0  # Error tracking
+django-cache-memoize==0.1.10  # Caching
+gunicorn==21.2.0  # Production server
+
+# Database
+mysqlclient==2.2.0
+
+# Testing & Quality Assurance
+pytest==7.4.3
+pytest-django==4.7.0
+coverage==7.3.2
+black==23.11.0  # Code formatting
+flake8==6.1.0  # Code linting
+mypy==1.7.0  # Type checking
+
+# Documentation
+Sphinx==7.2.6
+sphinx-rtd-theme==1.3.0
+
+# Development Tools
+django-extensions==3.2.3
+ipython==8.17.2
