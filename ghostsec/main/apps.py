@@ -4,3 +4,4 @@ class MainConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'ghostsec.main'
     label = 'main'
+    verbose_name = 'Main'

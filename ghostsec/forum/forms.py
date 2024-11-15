@@ -1,21 +1,32 @@
-from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SelectField, SubmitField
-from wtforms.validators import DataRequired
+from django import forms
+from .models import ForumPost, ForumComment
 
-class PostForm(FlaskForm):
-    title = StringField('Title', validators=[DataRequired()])
-    content = TextAreaField('Content', validators=[DataRequired()])
-    category = SelectField('Category', 
-                         choices=[('general', 'General Discussion'),
-                                ('kali', 'Kali Linux'),
-                                ('python', 'Python Security'),
-                                ('pentesting', 'Penetration Testing'),
-                                ('ctf', 'CTF Discussion'),
-                                ('tools', 'Security Tools'),
-                                ('help', 'Help & Support')],
-                         validators=[DataRequired()])
-    submit = SubmitField('Post')
+class PostForm(forms.ModelForm):
+    category = forms.ChoiceField(
+        choices=[
+            ('general', 'General Discussion'),
+            ('kali', 'Kali Linux'),
+            ('python', 'Python Security'),
+            ('pentesting', 'Penetration Testing'),
+            ('ctf', 'CTF Discussion'),
+            ('tools', 'Security Tools'),
+            ('help', 'Help & Support')
+        ],
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
 
-class CommentForm(FlaskForm):
-    content = TextAreaField('Comment', validators=[DataRequired()])
-    submit = SubmitField('Comment')
+    class Meta:
+        model = ForumPost
+        fields = ['title', 'content', 'category']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'content': forms.Textarea(attrs={'class': 'form-control'}),
+        }
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = ForumComment
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }

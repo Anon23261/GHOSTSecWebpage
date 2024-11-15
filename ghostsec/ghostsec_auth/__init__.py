@@ -1,5 +1,8 @@
-from flask import Blueprint
+from django.apps import AppConfig
 
-auth = Blueprint('auth', __name__, url_prefix='/auth')
+class GhostSecAuthConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'ghostsec.ghostsec_auth'
+    label = 'ghostsec_auth'
 
-from . import routes
+default_app_config = 'ghostsec.ghostsec_auth.GhostSecAuthConfig'

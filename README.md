@@ -1,221 +1,174 @@
-# GhostSec - Advanced Cybersecurity Learning Platform
+# GhostSec - Professional Cybersecurity Learning Platform
 
-<div align="center">
+GhostSec is a comprehensive cybersecurity learning and analysis platform designed for security professionals, researchers, and enthusiasts. It provides a GitHub-like collaborative environment focused entirely on cybersecurity education and research.
 
-![GhostSec Logo](static/images/logo.png)
+## Features
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Docker](https://img.shields.io/badge/docker-required-blue.svg)](https://www.docker.com/)
-[![Documentation](https://img.shields.io/badge/docs-view%20here-green.svg)](https://docs.ghostsec.com)
+### Learning Platform
+- **Comprehensive Course System**
+  - Web Security
+  - Network Security
+  - Malware Analysis
+  - Bug Bounty
+  - Penetration Testing
+  - Linux Security
+  - Programming (Python, C/C++, C#, Assembly)
+  - Digital Forensics
 
-</div>
+- **Interactive Learning Environments**
+  - Isolated Practice Labs
+  - CTF Challenges
+  - Real-world Scenarios
+  - Custom Tool Integration
+  - Resource-controlled Sandboxes
 
-GhostSec is a state-of-the-art cybersecurity learning and research platform that combines advanced virtualization, real-time collaboration, and comprehensive learning resources. It provides isolated environments for various security disciplines while fostering a community of security professionals and enthusiasts.
+### Malware Analysis Platform
+- **Advanced Analysis Pipeline**
+  - Static Analysis
+  - Dynamic Analysis
+  - Network Traffic Analysis
+  - Memory Analysis
+  - YARA Rule Integration
+  - Automated Report Generation
 
-## 🚀 Key Features
+- **Sandbox Features**
+  - Multiple Platform Support
+  - Network Simulation
+  - API Monitoring
+  - Memory Dump Analysis
+  - Custom Rules Engine
 
-### 🔒 Learning Environments
+### Professional Tools
+- **Development Environments**
+  - Language-specific Sandboxes
+  - Integrated Development Tools
+  - Version Control Integration
+  - Code Review System
 
-1. **🦠 Malware Analysis Lab**
-   - Secure sandboxed environment with memory protection
-   - Advanced static and dynamic analysis tools
-   - YARA rule scanning and creation
-   - Network traffic analysis with Wireshark integration
-   - Automated reporting and IOC extraction
+- **Security Tools**
+  - Web Vulnerability Scanner
+  - Network Analysis Tools
+  - Reverse Engineering Tools
+  - Forensics Toolkit
 
-2. **🐛 Bug Bounty Lab**
-   - Full Kali Linux-based environment
-   - Web application security testing tools
-   - Vulnerable practice applications (DVWA, bWAPP, etc.)
-   - Structured learning paths with rewards
-   - Real-world scenario simulations
+## Installation
 
-3. **🎯 Penetration Testing Lab**
-   - Complete Kali Linux toolkit integration
-   - Segmented network environments
-   - Customizable target systems
-   - Advanced exploitation frameworks
-   - Reporting templates and automation
-
-4. **💻 Secure Development Environment**
-   - Multi-language support (Python, C/C++, C#)
-   - Static code analysis integration
-   - Security linting and SAST tools
-   - Secure coding guidelines
-   - CI/CD security integration
-
-### 🤝 Social Features
-
-1. **Community Interaction**
-   - Real-time chat and collaboration
-   - Forum discussions and knowledge sharing
-   - Video conferencing for team exercises
-   - Project collaboration tools
-   - Mentorship programs
-
-2. **Learning Resources**
-   - Interactive tutorials and workshops
-   - Community-contributed content
-   - Expert webinars and presentations
-   - Certification preparation materials
-   - Regular challenges and CTFs
-
-## 🛠 Technical Requirements
-
-### Minimum Requirements
-- Python 3.10+
-- Docker 20.10+
-- 8GB RAM
-- 50GB free disk space
-- Windows 10/11 or Linux (Ubuntu 20.04+)
-
-### Recommended Specifications
-- 16GB RAM
-- 100GB SSD storage
-- Multi-core processor
-- Virtualization support (VT-x/AMD-V)
-- Dedicated GPU (for certain analysis tools)
-
-## 📦 Installation
-
-### Quick Start
+1. Clone the repository:
 ```bash
-# Clone the repository
-git clone https://github.com/ghostsec/platform.git
-cd platform
+git clone https://github.com/yourusername/ghostsec.git
+cd ghostsec
+```
 
-# Create and activate virtual environment
+2. Create and activate virtual environment:
+```bash
 python -m venv venv
 source venv/bin/activate  # Linux/Mac
 venv\Scripts\activate     # Windows
+```
 
-# Install dependencies
+3. Install dependencies:
+```bash
 pip install -r requirements.txt
+```
 
-# Configure environment
+4. Set up environment variables:
+```bash
 cp .env.example .env
 # Edit .env with your settings
-
-# Initialize database
-python init_db.py
-
-# Start the platform
-python ghostsec_app.py
 ```
 
-### Docker Deployment
+5. Initialize the database:
 ```bash
-# Build and start containers
-docker-compose up -d
-
-# Monitor logs
-docker-compose logs -f
-
-# Scale services
-docker-compose up -d --scale worker=3
+python manage.py migrate
 ```
 
-## 🔧 Configuration
-
-### Environment Variables
-```env
-FLASK_APP=ghostsec_app.py
-FLASK_ENV=production
-SECRET_KEY=your-secret-key
-DATABASE_URL=postgresql://user:pass@localhost/ghostsec
-REDIS_URL=redis://localhost:6379/0
+6. Create superuser:
+```bash
+python manage.py createsuperuser
 ```
 
-### Security Settings
-```python
-# config/production.py
-SECURITY_PASSWORD_SALT = 'your-salt'
-SESSION_COOKIE_SECURE = True
-REMEMBER_COOKIE_SECURE = True
-PERMANENT_SESSION_LIFETIME = timedelta(minutes=60)
+7. Start development server:
+```bash
+python manage.py runserver
 ```
 
-## 🔐 Security Features
+## Dependencies
 
-1. **Platform Security**
-   - Docker-based isolation
-   - Network segmentation
-   - Resource monitoring
-   - Access control (RBAC)
-   - Audit logging
+- Python 3.10+
+- Redis (for Channels and Celery)
+- PostgreSQL (recommended for production)
+- Additional system packages for malware analysis
 
-2. **User Security**
-   - Strong password policies
-   - 2FA support
-   - Session management
-   - API authentication
-   - Rate limiting
+## Development Setup
 
-## 🤝 Contributing
+1. Install Redis:
+```bash
+# Windows: Download from https://redis.io/download
+# Linux:
+sudo apt-get install redis-server
+```
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+2. Start Celery worker:
+```bash
+celery -A ghostsec worker -l info
+```
+
+3. Start Celery beat (for scheduled tasks):
+```bash
+celery -A ghostsec beat -l info
+```
+
+## Production Deployment
+
+1. Set up production environment:
+```bash
+python manage.py check --deploy
+```
+
+2. Configure settings:
+- Update ALLOWED_HOSTS
+- Set DEBUG = False
+- Configure secure SSL/TLS
+- Set up proper database (PostgreSQL recommended)
+
+3. Collect static files:
+```bash
+python manage.py collectstatic
+```
+
+4. Use gunicorn for deployment:
+```bash
+gunicorn ghostsec.wsgi:application
+```
+
+## Security Considerations
+
+- All uploaded malware samples are handled in isolated environments
+- Strict access controls and permissions system
+- Regular security audits and updates
+- Comprehensive logging and monitoring
+- SSL/TLS encryption enforced
+- CSRF and XSS protection enabled
+- Content Security Policy implemented
+
+## Contributing
 
 1. Fork the repository
 2. Create your feature branch
-   ```bash
-   git checkout -b feature/amazing-feature
-   ```
 3. Commit your changes
-   ```bash
-   git commit -m 'Add amazing feature'
-   ```
 4. Push to the branch
-   ```bash
-   git push origin feature/amazing-feature
-   ```
-5. Open a Pull Request
+5. Create a Pull Request
 
-## 📄 License
+## License
 
-This project is licensed under the MIT License with additional terms - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-## ⚠️ Disclaimer
+## Support
 
-This platform is designed for educational and research purposes only. Users are responsible for complying with applicable laws and regulations. The creators are not responsible for any misuse of this software.
+For support, please open an issue in the GitHub repository or contact the maintainers.
 
-## 🆘 Support
+## Acknowledgments
 
-- 📚 [Documentation](https://docs.ghostsec.com)
-- 💬 [Discord Community](https://discord.gg/ghostsec)
-- 🎫 [Issue Tracker](https://github.com/ghostsec/platform/issues)
-- 📧 [Email Support](mailto:support@ghostsec.com)
-
-## 🌟 Acknowledgments
-
-- Docker for containerization
-- Flask team for the web framework
-- Kali Linux for security tools
-- Open-source security community
-
-## 🗺 Roadmap
-
-### Q2 2024
-- [ ] Enhanced WebSocket implementation
-- [ ] Advanced user profiles
-- [ ] Improved search functionality
-
-### Q3 2024
-- [ ] Machine learning threat detection
-- [ ] Advanced reporting system
-- [ ] Mobile app development
-
-### Q4 2024
-- [ ] Enterprise features
-- [ ] Advanced API integration
-- [ ] Cloud deployment options
-
-## 👥 Core Team
-
-- Lead Developer: [@leaddev](https://github.com/leaddev)
-- Security Architect: [@secarch](https://github.com/secarch)
-- UI/UX Designer: [@uxdesigner](https://github.com/uxdesigner)
-
-## 📊 Project Status
-
-![Active Development](https://img.shields.io/badge/status-active-success.svg)
+- Thanks to all contributors and the cybersecurity community
+- Built with Django and modern security tools
+- Inspired by the need for professional-grade security training
