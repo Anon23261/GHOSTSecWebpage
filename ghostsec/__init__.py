@@ -2,5 +2,4 @@
 GhostSec Django application initialization.
 """
 
-# This file should be kept empty to avoid import issues
-# App configuration is handled in apps.py
+default_app_config = 'ghostsec.apps.GhostSecConfig'

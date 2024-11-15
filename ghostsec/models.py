@@ -54,7 +54,6 @@ class User(AbstractUser):
     phone_number = models.CharField(max_length=200, null=True, blank=True)
     linkedin = models.CharField(max_length=100, null=True, blank=True)
     reputation_points = models.IntegerField(default=0)
-    ctf_points = models.IntegerField(default=0)
     python_points = models.IntegerField(default=0)
     kali_points = models.IntegerField(default=0)
     malware_points = models.IntegerField(default=0)
@@ -92,7 +91,7 @@ class User(AbstractUser):
 
     def _update_skill_level(self):
         total_points = (
-            self.ctf_points + self.python_points + self.kali_points +
+            self.python_points + self.kali_points +
             self.malware_points + self.pentest_points + self.cpp_points
         )
         if total_points < 100:
