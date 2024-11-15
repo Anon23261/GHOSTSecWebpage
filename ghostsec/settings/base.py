@@ -1,5 +1,5 @@
 """
-Django base settings for ghostsec project.
+Django base settings for GhostSec project.
 """
 
 import os
@@ -24,28 +24,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'channels',
+    'ghostsec.apps.GhostSecConfig',
     'rest_framework',
     'corsheaders',
-    'django_celery_results',
-    'django_celery_beat',
     'crispy_forms',
-    'crispy_bootstrap5',
-    'ghostsec.ctf.apps.CTFConfig',
-    'ghostsec.forum.apps.ForumConfig',
-    'ghostsec.learning.apps.LearningConfig',
-    'ghostsec.learning_environments.apps.LearningEnvironmentsConfig',
-    'ghostsec.main.apps.MainConfig',
-    'ghostsec.marketplace.apps.MarketplaceConfig',
-    'ghostsec.news.apps.NewsConfig',
-    'ghostsec.oauth.apps.OAuthConfig',
-    'ghostsec.malware.apps.MalwareConfig',
+    'crispy_bootstrap4',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -58,7 +47,7 @@ ROOT_URLCONF = 'ghostsec.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -72,62 +61,58 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'ghostsec.wsgi.application'
-ASGI_APPLICATION = 'ghostsec.asgi.application'
 
-# Celery Configuration
-CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379/0')
-CELERY_RESULT_BACKEND = 'django-db'
-CELERY_CACHE_BACKEND = 'django-cache'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC'
-CELERY_TASK_TRACK_STARTED = True
-CELERY_TASK_TIME_LIMIT = 30 * 60
-
-# Channel Layers
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379/1')],
-        },
+# Password validation
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
-}
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
 
-# REST Framework
+# Internationalization
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'UTC'
+USE_I18N = True
+USE_TZ = True
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+# Default primary key field type
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Crispy Forms
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# Rest Framework
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
-    ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20,
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
 }
 
-# CORS Configuration
+# CORS settings
+CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "http://127.0.0.1:8000",
-]
-CORS_ALLOW_CREDENTIALS = True
-
-# Crispy Forms
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
-CRISPY_TEMPLATE_PACK = "bootstrap5"
-
-# File Upload Settings
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
-# Static files
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
 ]
 
 # Security Settings
@@ -140,11 +125,3 @@ SECURE_SSL_REDIRECT = True
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
-
-# Malware Analysis Settings
-MALWARE_UPLOAD_PATH = 'malware_samples/'
-MALWARE_ANALYSIS_TIMEOUT = 3600  # 1 hour
-YARA_RULES_PATH = BASE_DIR / 'yara_rules'
-
-# Default primary key field type
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
