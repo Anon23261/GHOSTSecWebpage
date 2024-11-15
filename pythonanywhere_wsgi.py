@@ -1,3 +1,7 @@
+"""
+WSGI config for GhostSec project.
+"""
+
 import os
 import sys
 
@@ -6,8 +10,8 @@ project_home = '/home/anonymous23/GhostSec'
 if project_home not in sys.path:
     sys.path.insert(0, project_home)
 
-# Set environment variables
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ghostsec.settings.pythonanywhere')
+# Set Django settings module
+os.environ['DJANGO_SETTINGS_MODULE'] = 'ghostsec.settings.pythonanywhere'
 
 # Import Django WSGI handler
 from django.core.wsgi import get_wsgi_application

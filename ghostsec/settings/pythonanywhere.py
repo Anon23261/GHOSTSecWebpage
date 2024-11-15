@@ -1,12 +1,16 @@
-from .base import *
-import os
+"""
+PythonAnywhere specific settings
+"""
 
+from .base import *
+
+# Debug settings
 DEBUG = False
 
 # Host settings
 ALLOWED_HOSTS = ['anonymous23.pythonanywhere.com']
 
-# Database
+# Database settings
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -14,15 +18,15 @@ DATABASES = {
     }
 }
 
-# Static files
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# Static files configuration
+STATIC_ROOT = '/home/anonymous23/GhostSec/static'
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'ghostsec/static'),
+    os.path.join(BASE_DIR, 'static'),
 ]
 
-# Media files
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# Media files configuration
+MEDIA_ROOT = '/home/anonymous23/GhostSec/media'
 MEDIA_URL = '/media/'
 
 # Security settings
@@ -30,32 +34,50 @@ SECURE_SSL_REDIRECT = False  # Set to True if you have SSL
 SESSION_COOKIE_SECURE = False  # Set to True if you have SSL
 CSRF_COOKIE_SECURE = False  # Set to True if you have SSL
 SECURE_BROWSER_XSS_FILTER = True
-X_FRAME_OPTIONS = 'DENY'
 SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
 
-# Email settings
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-# Whitenoise settings
+# WhiteNoise configuration
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-INSTALLED_APPS += [
-    'whitenoise.runserver_nostatic',
-]
-
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-] + MIDDLEWARE
-
-# Cache configuration - local memory for free tier
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake',
-    }
-}
+MIDDLEWARE = ['whitenoise.middleware.WhiteNoiseMiddleware'] + MIDDLEWARE
 
 # Disable Celery in PythonAnywhere free tier
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_TASK_EAGER_PROPAGATES = True
+
+# Logging configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': '/home/anonymous23/GhostSec/django_error.log',
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'ghostsec': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
