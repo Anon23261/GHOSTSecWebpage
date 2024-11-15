@@ -9,8 +9,8 @@ class GhostSecConfig(AppConfig):
         """
         Initialize app when Django is ready
         """
+        # Import and register signals
         try:
-            # Import signals
-            import ghostsec.signals
+            import ghostsec.signals  # noqa
         except ImportError:
             pass

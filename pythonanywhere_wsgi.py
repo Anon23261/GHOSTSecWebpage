@@ -13,10 +13,6 @@ if project_home not in sys.path:
 # Set Django settings module
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ghostsec.settings.pythonanywhere')
 
-# Set up Django
-import django
-django.setup()
-
 # Import Django WSGI handler
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
