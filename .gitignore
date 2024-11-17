@@ -25,28 +25,34 @@ venv/
 env/
 ENV/
 
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
+# Unnecessary files for PythonAnywhere
+nginx/
+nginx.conf
+ghostsec_wsgi.py
+generate_cert.py
+get_ip.py
 
-# Environment Variables
+# Environment files
 .env
-.env.local
-.env.*.local
-
-# Logs
-logs/
-*.log
-
-# Docker
-.docker/
-docker-compose.override.yml
+*.env
+.env.*
 
 # Database
 *.db
 *.sqlite3
+
+# Logs and temporary files
+*.log
+*.tmp
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local development
+.vscode/
+.idea/
+*.swp
+*.swo
 
 # Security and Sensitive Files
 *.pem
@@ -88,8 +94,5 @@ wheels/
 *.egg
 
 # Temporary files
-*.tmp
-*.temp
-*.swp
 .DS_Store
 Thumbs.db
