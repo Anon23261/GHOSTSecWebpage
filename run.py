@@ -11,11 +11,15 @@ Usage:
         FLASK_ENV=production python run.py
 """
 import os
-from ghostsec import create_app, socketio
+from __init__ import create_app, socketio
+from routes import init_routes
 
 # Determine environment
 env = os.environ.get('FLASK_ENV', 'development')
 app = create_app(env)
+
+# Initialize routes
+init_routes(app)
 
 if __name__ == '__main__':
     # Get host and port from environment or use defaults
