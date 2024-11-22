@@ -29,60 +29,28 @@ class VulnerabilityLab(Lab):
     def __init__(self, name: str, vulnerability_type: str):
         super().__init__(name, f"Learn about {vulnerability_type} vulnerabilities")
         self.vulnerability_type = vulnerability_type
-        self.docker_client = docker.from_env()
-        self.api_client = docker.APIClient()
         self.container = None
         
     def start(self) -> bool:
         try:
-            logger.info("Starting vulnerability lab container...")
+            client = docker.from_env()
             
             # For testing, use ubuntu
             # In production, we'll use webgoat/webgoat-8.0
             image = "ubuntu:latest" if "test" in self.name else "webgoat/webgoat-8.0"
             
-            # Pull the image first
-            logger.info(f"Pulling image: {image}")
-            self.docker_client.images.pull(image)
-            
-            # Create container config
-            container_name = f"ghostsec_{self.name}_{int(time.time())}"
-            host_config = self.api_client.create_host_config(
-                auto_remove=True
-            )
-            
-            # Create container
-            logger.info("Creating container...")
-            container = self.api_client.create_container(
-                image=image,
-                command="tail -f /dev/null",
+            # Create and start container
+            self.container = client.containers.run(
+                image,
+                "tail -f /dev/null",  # Keep container running
                 detach=True,
-                name=container_name,
-                host_config=host_config
+                remove=True  # Auto-remove when stopped
             )
             
-            # Start container
-            logger.info("Starting container...")
-            self.api_client.start(container=container.get('Id'))
-            
-            # Get container object
-            self.container = self.docker_client.containers.get(container.get('Id'))
-            
-            # Check status
-            time.sleep(1)  # Give it a moment to start
-            inspect = self.api_client.inspect_container(container.get('Id'))
-            state = inspect.get('State', {})
-            status = state.get('Status', 'unknown')
-            
-            logger.info(f"Container status: {status}")
-            logger.info(f"Container state: {state}")
-            
-            return status == 'running'
+            return True
             
         except Exception as e:
             logger.error(f"Failed to start vulnerability lab: {str(e)}")
-            if hasattr(e, 'response'):
-                logger.error(f"Docker API response: {e.response.content}")
             return False
             
     def get_challenges(self) -> List[Dict]:

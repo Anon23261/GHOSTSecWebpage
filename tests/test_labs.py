@@ -75,10 +75,13 @@ def test_vulnerability_lab_start(vulnerability_lab):
     assert result is True, "Lab start() method returned False"
     assert vulnerability_lab.container is not None, "Container is None after start"
     
-    # Final check
+    # Wait for container
+    time.sleep(2)
+    
+    # Check container status
     vulnerability_lab.container.reload()
     assert vulnerability_lab.container.status == "running", \
-        f"Container failed to reach running state. Final status: {vulnerability_lab.container.status}"
+        f"Container failed to reach running state. Status: {vulnerability_lab.container.status}"
 
 def test_vulnerability_lab_challenges(vulnerability_lab):
     """Test vulnerability lab challenges."""
