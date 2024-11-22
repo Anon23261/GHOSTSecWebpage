@@ -75,23 +75,6 @@ def test_vulnerability_lab_start(vulnerability_lab):
     assert result is True, "Lab start() method returned False"
     assert vulnerability_lab.container is not None, "Container is None after start"
     
-    # Wait for container to be running
-    logger.info("Waiting for container to be running...")
-    max_retries = 3
-    retry_delay = 1
-    
-    for attempt in range(max_retries):
-        vulnerability_lab.container.reload()
-        status = vulnerability_lab.container.status
-        logger.info(f"Container status (attempt {attempt + 1}/{max_retries}): {status}")
-        
-        if status == "running":
-            break
-            
-        if attempt < max_retries - 1:
-            logger.info(f"Container not running, waiting {retry_delay} seconds...")
-            time.sleep(retry_delay)
-    
     # Final check
     vulnerability_lab.container.reload()
     assert vulnerability_lab.container.status == "running", \

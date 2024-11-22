@@ -36,31 +36,28 @@ class VulnerabilityLab(Lab):
         try:
             logger.info("Starting vulnerability lab container...")
             
-            # For testing, use a simple nginx image
+            # For testing, use a simple hello-world image
             # In production, we'll use webgoat/webgoat-8.0
-            image = "nginx:latest" if "test" in self.name else "webgoat/webgoat-8.0"
+            image = "hello-world:latest" if "test" in self.name else "webgoat/webgoat-8.0"
             
             # Pull the image first
             logger.info(f"Pulling image: {image}")
             self.docker_client.images.pull(image)
             
-            # Create container
-            logger.info("Creating container...")
-            self.container = self.docker_client.containers.create(
-                image=image,
-                detach=True,
-                name=f"ghostsec_{self.name}_{int(time.time())}"
-            )
-            
             # Start container
             logger.info("Starting container...")
-            self.container.start()
+            self.container = self.docker_client.containers.run(
+                image=image,
+                detach=True,
+                name=f"ghostsec_{self.name}_{int(time.time())}",
+                remove=True,  # Auto-remove when stopped
+                ports={'8080/tcp': 8080} if "webgoat" in image else None
+            )
             
-            # Wait for container
-            time.sleep(2)
+            # Check status
             self.container.reload()
-            
             logger.info(f"Container status: {self.container.status}")
+            
             return self.container.status == 'running'
             
         except Exception as e:
@@ -95,8 +92,7 @@ class VulnerabilityLab(Lab):
                 logger.info("Cleaning up vulnerability lab container...")
                 try:
                     self.container.stop()
-                    self.container.remove()
-                    logger.info("Container stopped and removed successfully")
+                    logger.info("Container stopped successfully")
                 except Exception as e:
                     logger.error(f"Error during container cleanup: {e}")
                 self.container = None
