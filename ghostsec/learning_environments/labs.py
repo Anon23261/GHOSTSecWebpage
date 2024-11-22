@@ -30,6 +30,7 @@ class VulnerabilityLab(Lab):
         super().__init__(name, f"Learn about {vulnerability_type} vulnerabilities")
         self.vulnerability_type = vulnerability_type
         self.container = None
+        self.network = None
         
     def start(self) -> bool:
         try:
@@ -39,7 +40,7 @@ class VulnerabilityLab(Lab):
             # Create network first
             network_name = f"vuln_lab_{self.name}"
             logger.info(f"Creating network: {network_name}")
-            network = client.networks.create(
+            self.network = client.networks.create(
                 network_name,
                 driver="bridge"
             )
@@ -52,15 +53,24 @@ class VulnerabilityLab(Lab):
             logger.info(f"Pulling image: {image}")
             client.images.pull(image)
             
-            # Create and start container
-            logger.info("Creating and starting container...")
-            self.container = client.containers.run(
-                image,
+            # Create container first
+            logger.info("Creating container...")
+            container = client.api.create_container(
+                image=image,
                 command="tail -f /dev/null",  # Keep container running
                 detach=True,
-                remove=True,  # Auto-remove when stopped
-                network=network_name  # Use our network
+                host_config=client.api.create_host_config(
+                    network_mode=network_name,
+                    auto_remove=True
+                )
             )
+            
+            # Start container
+            logger.info("Starting container...")
+            client.api.start(container=container.get('Id'))
+            
+            # Get container object
+            self.container = client.containers.get(container.get('Id'))
             
             # Log container info
             logger.info(f"Container ID: {self.container.id}")
@@ -105,14 +115,14 @@ class VulnerabilityLab(Lab):
                 self.container = None
                 
             # Clean up network
-            try:
-                network_name = f"vuln_lab_{self.name}"
-                client = docker.from_env()
-                network = client.networks.get(network_name)
-                network.remove()
-                logger.info(f"Network {network_name} removed successfully")
-            except Exception as e:
-                logger.error(f"Error removing network: {e}")
+            if self.network:
+                try:
+                    logger.info(f"Cleaning up network {self.network.name}...")
+                    self.network.remove()
+                    logger.info("Network removed successfully")
+                except Exception as e:
+                    logger.error(f"Error removing network: {e}")
+                self.network = None
                 
         except Exception as e:
             logger.error(f"Failed to cleanup vulnerability lab: {e}")
