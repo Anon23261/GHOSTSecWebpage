@@ -39,29 +39,46 @@ class VulnerabilityLab(Lab):
             # In production, we'll use webgoat/webgoat-8.0
             image = "ubuntu:latest" if "test" in self.name else "webgoat/webgoat-8.0"
             
+            # Pull the image first
+            logger.info(f"Pulling image: {image}")
+            self.docker_client.images.pull(image)
+            
+            # Create container configuration
+            container_config = {
+                'image': image,
+                'command': 'tail -f /dev/null',  # Keep container running
+                'detach': True,
+                'tty': True,
+                'stdin_open': True
+            }
+            
+            # Add ports if using webgoat
+            if "webgoat" in image:
+                container_config['ports'] = {'8080/tcp': 8080}
+            
+            # Create and start the container using the low-level API
+            logger.info("Creating container...")
+            api_client = docker.APIClient(base_url='unix://var/run/docker.sock')
+            container = api_client.create_container(**container_config)
+            container_id = container.get('Id')
+            
             # Start the container
-            self.container = self.docker_client.containers.run(
-                image,
-                detach=True,
-                command="tail -f /dev/null" if "ubuntu" in image else "sleep infinity",  # Keep container running
-                ports={'8080/tcp': 8080} if "webgoat" in image else None
-            )
-            logger.info(f"Container created with status: {self.container.status}")
+            logger.info("Starting container...")
+            api_client.start(container_id)
             
-            # Wait for container to be running
+            # Get the container object
+            self.container = self.docker_client.containers.get(container_id)
+            logger.info(f"Container status: {self.container.status}")
+            
+            # Verify container is running
             self.container.reload()
-            logger.info(f"Container status after reload: {self.container.status}")
+            logger.info(f"Final container status: {self.container.status}")
             
-            if self.container.status != 'running':
-                logger.info("Container not running, attempting to start...")
-                self.container.start()
-                self.container.reload()
-                logger.info(f"Container status after start: {self.container.status}")
-            
-            # Final status check
             return self.container.status == 'running'
         except Exception as e:
             logger.error(f"Failed to start vulnerability lab: {e}")
+            if hasattr(e, 'response'):
+                logger.error(f"Docker API response: {e.response.content}")
             return False
             
     def get_challenges(self) -> List[Dict]:

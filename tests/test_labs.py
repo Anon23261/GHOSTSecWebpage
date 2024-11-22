@@ -72,8 +72,22 @@ def test_vulnerability_lab_start(vulnerability_lab):
     
     # Wait for container to be running
     logger.info("Waiting for container to be running...")
-    assert wait_for_container_status(vulnerability_lab.container, "running"), \
-        f"Container failed to reach running state. Current status: {vulnerability_lab.container.status}"
+    max_retries = 5
+    retry_delay = 2
+    
+    for attempt in range(max_retries):
+        vulnerability_lab.container.reload()
+        logger.info(f"Container status (attempt {attempt + 1}/{max_retries}): {vulnerability_lab.container.status}")
+        
+        if vulnerability_lab.container.status == "running":
+            break
+            
+        if attempt < max_retries - 1:
+            logger.info(f"Container not running, waiting {retry_delay} seconds...")
+            time.sleep(retry_delay)
+    
+    assert vulnerability_lab.container.status == "running", \
+        f"Container failed to reach running state. Final status: {vulnerability_lab.container.status}"
 
 def test_vulnerability_lab_challenges(vulnerability_lab):
     """Test vulnerability lab challenges."""
