@@ -2,6 +2,7 @@ from typing import List, Dict
 import docker
 import logging
 from pathlib import Path
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -35,48 +36,35 @@ class VulnerabilityLab(Lab):
         try:
             logger.info("Starting vulnerability lab container...")
             
-            # For testing, use a simple ubuntu image
+            # For testing, use a simple nginx image
             # In production, we'll use webgoat/webgoat-8.0
-            image = "ubuntu:latest" if "test" in self.name else "webgoat/webgoat-8.0"
+            image = "nginx:latest" if "test" in self.name else "webgoat/webgoat-8.0"
             
             # Pull the image first
             logger.info(f"Pulling image: {image}")
             self.docker_client.images.pull(image)
             
-            # Create container configuration
-            container_config = {
-                'image': image,
-                'command': 'tail -f /dev/null',  # Keep container running
-                'detach': True,
-                'tty': True,
-                'stdin_open': True
-            }
-            
-            # Add ports if using webgoat
-            if "webgoat" in image:
-                container_config['ports'] = {'8080/tcp': 8080}
-            
-            # Create and start the container using the low-level API
+            # Create container
             logger.info("Creating container...")
-            api_client = docker.APIClient(base_url='unix://var/run/docker.sock')
-            container = api_client.create_container(**container_config)
-            container_id = container.get('Id')
+            self.container = self.docker_client.containers.create(
+                image=image,
+                detach=True,
+                name=f"ghostsec_{self.name}_{int(time.time())}"
+            )
             
-            # Start the container
+            # Start container
             logger.info("Starting container...")
-            api_client.start(container_id)
+            self.container.start()
             
-            # Get the container object
-            self.container = self.docker_client.containers.get(container_id)
-            logger.info(f"Container status: {self.container.status}")
-            
-            # Verify container is running
+            # Wait for container
+            time.sleep(2)
             self.container.reload()
-            logger.info(f"Final container status: {self.container.status}")
             
+            logger.info(f"Container status: {self.container.status}")
             return self.container.status == 'running'
+            
         except Exception as e:
-            logger.error(f"Failed to start vulnerability lab: {e}")
+            logger.error(f"Failed to start vulnerability lab: {str(e)}")
             if hasattr(e, 'response'):
                 logger.error(f"Docker API response: {e.response.content}")
             return False
