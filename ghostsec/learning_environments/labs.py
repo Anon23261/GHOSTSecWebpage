@@ -30,6 +30,7 @@ class VulnerabilityLab(Lab):
         super().__init__(name, f"Learn about {vulnerability_type} vulnerabilities")
         self.vulnerability_type = vulnerability_type
         self.docker_client = docker.from_env()
+        self.api_client = docker.APIClient()
         self.container = None
         
     def start(self) -> bool:
@@ -44,26 +45,39 @@ class VulnerabilityLab(Lab):
             logger.info(f"Pulling image: {image}")
             self.docker_client.images.pull(image)
             
+            # Create container config
+            container_name = f"ghostsec_{self.name}_{int(time.time())}"
+            host_config = self.api_client.create_host_config(
+                auto_remove=True
+            )
+            
             # Create container
             logger.info("Creating container...")
-            self.container = self.docker_client.containers.create(
+            container = self.api_client.create_container(
                 image=image,
-                command="tail -f /dev/null",  # Keep container running
+                command="tail -f /dev/null",
                 detach=True,
-                name=f"ghostsec_{self.name}_{int(time.time())}",
-                remove=True  # Auto-remove when stopped
+                name=container_name,
+                host_config=host_config
             )
             
             # Start container
             logger.info("Starting container...")
-            self.container.start()
+            self.api_client.start(container=container.get('Id'))
+            
+            # Get container object
+            self.container = self.docker_client.containers.get(container.get('Id'))
             
             # Check status
             time.sleep(1)  # Give it a moment to start
-            self.container.reload()
-            logger.info(f"Container status: {self.container.status}")
+            inspect = self.api_client.inspect_container(container.get('Id'))
+            state = inspect.get('State', {})
+            status = state.get('Status', 'unknown')
             
-            return self.container.status == 'running'
+            logger.info(f"Container status: {status}")
+            logger.info(f"Container state: {state}")
+            
+            return status == 'running'
             
         except Exception as e:
             logger.error(f"Failed to start vulnerability lab: {str(e)}")
