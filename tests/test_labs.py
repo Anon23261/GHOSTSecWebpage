@@ -76,10 +76,14 @@ def test_vulnerability_lab_start(vulnerability_lab):
     assert vulnerability_lab.container is not None, "Container is None after start"
     
     # Wait for container
+    logger.info("Waiting for container to start...")
     time.sleep(2)
     
     # Check container status
     vulnerability_lab.container.reload()
+    logger.info(f"Container status after reload: {vulnerability_lab.container.status}")
+    logger.info(f"Container attrs after reload: {vulnerability_lab.container.attrs}")
+    
     assert vulnerability_lab.container.status == "running", \
         f"Container failed to reach running state. Status: {vulnerability_lab.container.status}"
 

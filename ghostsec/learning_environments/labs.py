@@ -33,19 +33,31 @@ class VulnerabilityLab(Lab):
         
     def start(self) -> bool:
         try:
+            logger.info("Starting vulnerability lab container...")
             client = docker.from_env()
             
             # For testing, use ubuntu
             # In production, we'll use webgoat/webgoat-8.0
             image = "ubuntu:latest" if "test" in self.name else "webgoat/webgoat-8.0"
             
+            # Pull image first
+            logger.info(f"Pulling image: {image}")
+            client.images.pull(image)
+            
             # Create and start container
+            logger.info("Creating and starting container...")
             self.container = client.containers.run(
                 image,
-                "tail -f /dev/null",  # Keep container running
+                command="tail -f /dev/null",  # Keep container running
                 detach=True,
-                remove=True  # Auto-remove when stopped
+                remove=True,  # Auto-remove when stopped
+                network_mode='bridge'  # Same as NetworkingLab
             )
+            
+            # Log container info
+            logger.info(f"Container ID: {self.container.id}")
+            logger.info(f"Container status: {self.container.status}")
+            logger.info(f"Container attrs: {self.container.attrs}")
             
             return True
             
@@ -76,7 +88,7 @@ class VulnerabilityLab(Lab):
         """Clean up lab resources."""
         try:
             if self.container:
-                logger.info("Cleaning up vulnerability lab container...")
+                logger.info(f"Cleaning up container {self.container.id}...")
                 try:
                     self.container.stop()
                     logger.info("Container stopped successfully")
