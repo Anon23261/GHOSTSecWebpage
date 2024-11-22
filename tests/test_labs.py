@@ -1,6 +1,7 @@
 """Test suite for GhostSec learning environments."""
 import pytest
 import docker
+import time
 from ghostsec.learning_environments.labs import (
     VulnerabilityLab,
     NetworkingLab,
@@ -46,6 +47,15 @@ def test_vulnerability_lab_start(vulnerability_lab):
     result = vulnerability_lab.start()
     assert result is True
     assert vulnerability_lab.container is not None
+    
+    # Give container some time to start if needed
+    max_retries = 3
+    for _ in range(max_retries):
+        vulnerability_lab.container.reload()
+        if vulnerability_lab.container.status == "running":
+            break
+        time.sleep(1)
+    
     assert vulnerability_lab.container.status == "running"
 
 def test_vulnerability_lab_challenges(vulnerability_lab):

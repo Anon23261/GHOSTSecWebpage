@@ -33,12 +33,21 @@ class VulnerabilityLab(Lab):
         
     def start(self) -> bool:
         try:
+            # Start the container
             self.container = self.docker_client.containers.run(
                 "webgoat/webgoat-8.0",
                 detach=True,
                 ports={'8080/tcp': 8080}
             )
-            return True
+            
+            # Wait for container to be running
+            self.container.reload()  # Refresh container state
+            if self.container.status != 'running':
+                self.container.start()  # Explicitly start if not running
+                self.container.reload()  # Refresh state again
+            
+            # Verify container is running
+            return self.container.status == 'running'
         except Exception as e:
             logger.error(f"Failed to start vulnerability lab: {e}")
             return False
