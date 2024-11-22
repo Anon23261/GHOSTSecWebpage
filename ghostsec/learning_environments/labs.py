@@ -61,6 +61,19 @@ class VulnerabilityLab(Lab):
                 'points': 300
             }
         ]
+        
+    def cleanup(self) -> None:
+        """Clean up lab resources."""
+        try:
+            if self.container:
+                try:
+                    self.container.stop()
+                    self.container.remove()
+                except:
+                    pass
+                self.container = None
+        except Exception as e:
+            logger.error(f"Failed to cleanup vulnerability lab: {e}")
 
 
 class NetworkingLab(Lab):
@@ -98,13 +111,36 @@ class NetworkingLab(Lab):
             logger.error(f"Failed to start networking lab: {e}")
             return False
             
-    def get_tools(self) -> List[str]:
-        return [
-            'nmap',
-            'wireshark',
-            'tcpdump',
-            'netcat'
-        ]
+    def get_tools(self) -> Dict[str, str]:
+        return {
+            'nmap': 'Network mapper for network discovery and security auditing',
+            'wireshark': 'Network protocol analyzer for network troubleshooting and analysis',
+            'tcpdump': 'Command-line packet analyzer',
+            'netcat': 'Networking utility for reading/writing network connections'
+        }
+        
+    def cleanup(self) -> None:
+        """Clean up lab resources."""
+        try:
+            # Stop and remove containers
+            for container in self.containers.values():
+                try:
+                    container.stop()
+                    container.remove()
+                except:
+                    pass
+            
+            # Remove network
+            if self.network:
+                try:
+                    self.network.remove()
+                except:
+                    pass
+                    
+            self.containers = {}
+            self.network = None
+        except Exception as e:
+            logger.error(f"Failed to cleanup networking lab: {e}")
 
 
 class CryptographyLab(Lab):

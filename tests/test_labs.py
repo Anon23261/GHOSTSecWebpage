@@ -8,9 +8,20 @@ from ghostsec.learning_environments.labs import (
     ReverseEngineeringLab
 )
 
+def is_docker_available():
+    """Check if Docker is available and running."""
+    try:
+        client = docker.from_env()
+        client.ping()
+        return True
+    except:
+        return False
+
 @pytest.fixture
 def vulnerability_lab():
     """Create a vulnerability lab instance."""
+    if not is_docker_available():
+        pytest.skip("Docker not available")
     lab = VulnerabilityLab("test_vuln_lab", "sql_injection")
     yield lab
     lab.cleanup()
@@ -18,6 +29,8 @@ def vulnerability_lab():
 @pytest.fixture
 def networking_lab():
     """Create a networking lab instance."""
+    if not is_docker_available():
+        pytest.skip("Docker not available")
     lab = NetworkingLab("test_network_lab")
     yield lab
     lab.cleanup()
@@ -30,13 +43,10 @@ def test_vulnerability_lab_creation(vulnerability_lab):
 
 def test_vulnerability_lab_start(vulnerability_lab):
     """Test vulnerability lab startup."""
-    try:
-        result = vulnerability_lab.start()
-        assert result is True
-        assert vulnerability_lab.container is not None
-        assert vulnerability_lab.container.status == "running"
-    except docker.errors.DockerException:
-        pytest.skip("Docker not available")
+    result = vulnerability_lab.start()
+    assert result is True
+    assert vulnerability_lab.container is not None
+    assert vulnerability_lab.container.status == "running"
 
 def test_vulnerability_lab_challenges(vulnerability_lab):
     """Test vulnerability lab challenges."""
@@ -56,13 +66,10 @@ def test_networking_lab_creation(networking_lab):
 
 def test_networking_lab_start(networking_lab):
     """Test networking lab startup."""
-    try:
-        result = networking_lab.start()
-        assert result is True
-        assert networking_lab.network is not None
-        assert len(networking_lab.containers) > 0
-    except docker.errors.DockerException:
-        pytest.skip("Docker not available")
+    result = networking_lab.start()
+    assert result is True
+    assert networking_lab.network is not None
+    assert len(networking_lab.containers) > 0
 
 def test_networking_lab_tools(networking_lab):
     """Test networking lab tools."""
