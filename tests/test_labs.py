@@ -2,6 +2,7 @@
 import pytest
 import docker
 import time
+import logging
 from ghostsec.learning_environments.labs import (
     VulnerabilityLab,
     NetworkingLab,
@@ -9,14 +10,34 @@ from ghostsec.learning_environments.labs import (
     ReverseEngineeringLab
 )
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 def is_docker_available():
     """Check if Docker is available and running."""
     try:
         client = docker.from_env()
         client.ping()
         return True
-    except:
+    except Exception as e:
+        logger.error(f"Docker not available: {e}")
         return False
+
+def wait_for_container_status(container, target_status: str, timeout: int = 10) -> bool:
+    """Wait for container to reach target status."""
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        try:
+            container.reload()
+            logger.info(f"Container status: {container.status}")
+            if container.status == target_status:
+                return True
+            time.sleep(1)
+        except Exception as e:
+            logger.error(f"Error checking container status: {e}")
+            return False
+    return False
 
 @pytest.fixture
 def vulnerability_lab():
@@ -44,19 +65,15 @@ def test_vulnerability_lab_creation(vulnerability_lab):
 
 def test_vulnerability_lab_start(vulnerability_lab):
     """Test vulnerability lab startup."""
+    logger.info("Starting vulnerability lab test...")
     result = vulnerability_lab.start()
-    assert result is True
-    assert vulnerability_lab.container is not None
+    assert result is True, "Lab start() method returned False"
+    assert vulnerability_lab.container is not None, "Container is None after start"
     
-    # Give container some time to start if needed
-    max_retries = 3
-    for _ in range(max_retries):
-        vulnerability_lab.container.reload()
-        if vulnerability_lab.container.status == "running":
-            break
-        time.sleep(1)
-    
-    assert vulnerability_lab.container.status == "running"
+    # Wait for container to be running
+    logger.info("Waiting for container to be running...")
+    assert wait_for_container_status(vulnerability_lab.container, "running"), \
+        f"Container failed to reach running state. Current status: {vulnerability_lab.container.status}"
 
 def test_vulnerability_lab_challenges(vulnerability_lab):
     """Test vulnerability lab challenges."""
