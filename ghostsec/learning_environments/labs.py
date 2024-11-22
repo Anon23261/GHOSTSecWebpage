@@ -36,9 +36,9 @@ class VulnerabilityLab(Lab):
         try:
             logger.info("Starting vulnerability lab container...")
             
-            # For testing, use a simple hello-world image
+            # For testing, use busybox
             # In production, we'll use webgoat/webgoat-8.0
-            image = "hello-world:latest" if "test" in self.name else "webgoat/webgoat-8.0"
+            image = "busybox:latest" if "test" in self.name else "webgoat/webgoat-8.0"
             
             # Pull the image first
             logger.info(f"Pulling image: {image}")
@@ -48,6 +48,7 @@ class VulnerabilityLab(Lab):
             logger.info("Starting container...")
             self.container = self.docker_client.containers.run(
                 image=image,
+                command="sleep 3600" if "busybox" in image else None,
                 detach=True,
                 name=f"ghostsec_{self.name}_{int(time.time())}",
                 remove=True,  # Auto-remove when stopped
@@ -55,6 +56,7 @@ class VulnerabilityLab(Lab):
             )
             
             # Check status
+            time.sleep(1)  # Give it a moment to start
             self.container.reload()
             logger.info(f"Container status: {self.container.status}")
             
