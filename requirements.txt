@@ -3,38 +3,25 @@ Flask==2.3.3
 Flask-SQLAlchemy==3.1.1
 Flask-Login==0.6.3
 Flask-Mail==0.9.1
-Flask-SocketIO==5.3.6
-Flask-Migrate==4.0.5
 Flask-Limiter==3.5.0
 Flask-Bcrypt==1.0.1
-Flask-Cors==4.0.0
-Flask-JWT-Extended==4.5.3
 python-dotenv==1.0.0
 
 # Database
 SQLAlchemy==2.0.23
-psycopg2-binary==2.9.9
+mysqlclient==2.2.0
 alembic==1.12.1
-
-# WebSocket
-python-socketio==5.10.0
-python-engineio==4.8.0
-eventlet==0.33.3
 
 # Security
 bcrypt==4.0.1
 PyJWT==2.8.0
 cryptography==41.0.5
-yara-python==4.3.1
 
 # Utils
 Pillow==10.1.0
 requests==2.31.0
-redis==5.0.1
 gunicorn==21.2.0
 whitenoise==6.6.0
 
 # Development Tools
 pytest==7.4.3
-black==23.10.1
-flake8==6.1.0

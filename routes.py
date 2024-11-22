@@ -1,10 +1,10 @@
 """
 GhostSec application routes.
 """
-from flask import render_template, flash, redirect, url_for, request, jsonify
+from flask import render_template, flash, redirect, url_for, request, jsonify, abort
 from flask_login import login_user, current_user, logout_user, login_required
-from __init__ import db, bcrypt
-from models import User
+from . import db, bcrypt
+from .models import User, ForumPost, ForumComment, Achievement
 from datetime import datetime
 import logging
 
@@ -20,7 +20,8 @@ def init_routes(app):
     @app.route('/')
     @app.route('/home')
     def home():
-        return render_template('home.html', title='Home')
+        posts = ForumPost.query.order_by(ForumPost.date_posted.desc()).limit(5).all()
+        return render_template('home.html', title='Home', posts=posts)
 
     @app.route('/about')
     def about():
@@ -34,8 +35,7 @@ def init_routes(app):
         if request.method == 'POST':
             user = User.query.filter_by(email=request.form.get('email')).first()
             if user and bcrypt.check_password_hash(user.password, request.form.get('password')):
-                login_user(user)
-                flash('Login successful!', 'success')
+                login_user(user, remember=request.form.get('remember'))
                 next_page = request.args.get('next')
                 return redirect(next_page) if next_page else redirect(url_for('home'))
             flash('Login unsuccessful. Please check email and password', 'danger')
@@ -48,12 +48,19 @@ def init_routes(app):
             return redirect(url_for('home'))
             
         if request.method == 'POST':
+            if User.query.filter_by(email=request.form.get('email')).first():
+                flash('Email already registered', 'danger')
+                return redirect(url_for('register'))
+                
+            if User.query.filter_by(username=request.form.get('username')).first():
+                flash('Username already taken', 'danger')
+                return redirect(url_for('register'))
+                
             hashed_password = bcrypt.generate_password_hash(request.form.get('password')).decode('utf-8')
             user = User(
                 username=request.form.get('username'),
                 email=request.form.get('email'),
-                password=hashed_password,
-                created_at=datetime.utcnow()
+                password=hashed_password
             )
             db.session.add(user)
             db.session.commit()
@@ -69,21 +76,56 @@ def init_routes(app):
         flash('You have been logged out.', 'info')
         return redirect(url_for('home'))
 
-    @app.route('/dashboard')
+    @app.route('/profile')
     @login_required
-    def dashboard():
-        return render_template('dashboard.html', title='Dashboard')
+    def profile():
+        achievements = Achievement.query.filter_by(user_id=current_user.id).all()
+        posts = ForumPost.query.filter_by(author_id=current_user.id).order_by(ForumPost.date_posted.desc()).all()
+        return render_template('profile.html', title='Profile', 
+                             achievements=achievements, posts=posts)
 
-    # API routes
-    @app.route('/api/user', methods=['GET'])
+    @app.route('/forum')
+    def forum():
+        page = request.args.get('page', 1, type=int)
+        posts = ForumPost.query.order_by(ForumPost.date_posted.desc()).paginate(page=page, per_page=10)
+        return render_template('forum.html', title='Forum', posts=posts)
+
+    @app.route('/forum/post/new', methods=['GET', 'POST'])
     @login_required
-    def get_user():
-        return jsonify({
-            'id': current_user.id,
-            'username': current_user.username,
-            'email': current_user.email,
-            'created_at': current_user.created_at.isoformat()
-        })
+    def new_post():
+        if request.method == 'POST':
+            post = ForumPost(
+                title=request.form.get('title'),
+                content=request.form.get('content'),
+                category=request.form.get('category'),
+                author_id=current_user.id
+            )
+            db.session.add(post)
+            db.session.commit()
+            flash('Your post has been created!', 'success')
+            return redirect(url_for('forum'))
+        return render_template('create_post.html', title='New Post')
+
+    @app.route('/forum/post/<int:post_id>')
+    def post(post_id):
+        post = ForumPost.query.get_or_404(post_id)
+        post.views += 1
+        db.session.commit()
+        return render_template('post.html', title=post.title, post=post)
+
+    @app.route('/forum/post/<int:post_id>/comment', methods=['POST'])
+    @login_required
+    def comment_post(post_id):
+        post = ForumPost.query.get_or_404(post_id)
+        comment = ForumComment(
+            content=request.form.get('content'),
+            author_id=current_user.id,
+            post_id=post.id
+        )
+        db.session.add(comment)
+        db.session.commit()
+        flash('Your comment has been added!', 'success')
+        return redirect(url_for('post', post_id=post.id))
 
     # Error handlers
     @app.errorhandler(404)
