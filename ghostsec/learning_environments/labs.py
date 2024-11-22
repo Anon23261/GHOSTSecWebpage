@@ -36,6 +36,14 @@ class VulnerabilityLab(Lab):
             logger.info("Starting vulnerability lab container...")
             client = docker.from_env()
             
+            # Create network first
+            network_name = f"vuln_lab_{self.name}"
+            logger.info(f"Creating network: {network_name}")
+            network = client.networks.create(
+                network_name,
+                driver="bridge"
+            )
+            
             # For testing, use ubuntu
             # In production, we'll use webgoat/webgoat-8.0
             image = "ubuntu:latest" if "test" in self.name else "webgoat/webgoat-8.0"
@@ -51,7 +59,7 @@ class VulnerabilityLab(Lab):
                 command="tail -f /dev/null",  # Keep container running
                 detach=True,
                 remove=True,  # Auto-remove when stopped
-                network_mode='bridge'  # Same as NetworkingLab
+                network=network_name  # Use our network
             )
             
             # Log container info
@@ -95,6 +103,17 @@ class VulnerabilityLab(Lab):
                 except Exception as e:
                     logger.error(f"Error during container cleanup: {e}")
                 self.container = None
+                
+            # Clean up network
+            try:
+                network_name = f"vuln_lab_{self.name}"
+                client = docker.from_env()
+                network = client.networks.get(network_name)
+                network.remove()
+                logger.info(f"Network {network_name} removed successfully")
+            except Exception as e:
+                logger.error(f"Error removing network: {e}")
+                
         except Exception as e:
             logger.error(f"Failed to cleanup vulnerability lab: {e}")
 
