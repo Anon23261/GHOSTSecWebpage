@@ -19,11 +19,10 @@ for dir_name in ['logs', 'uploads', 'yara_rules']:
 # Set environment variables
 os.environ['FLASK_ENV'] = 'production'
 os.environ['PYTHONPATH'] = project_home
-os.environ['DATABASE_URL'] = 'mysql://anonymous23:$password@anonymous23.mysql.pythonanywhere-services.com/anonymous23$ghostsec'
 
 # Load environment variables from .env file
 from dotenv import load_dotenv
-load_dotenv(os.path.join(project_home, '.env'))
+load_dotenv(os.path.join(project_home, '.env.pythonanywhere'))
 
 # Import Flask application
 from ghostsec import create_app
